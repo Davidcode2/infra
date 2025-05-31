@@ -1,0 +1,43 @@
+services:
+  reverse-proxy:
+    image: nginx:alpine
+    container_name: reverse_proxy
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      # if the certificate has expired, uncomment the below line and run "docker compose up -d"
+      - web-root:/var/www/html
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - reverse-proxy
+    command: certonly -v --webroot --webroot-path=/var/www/html --email jakob.lingel@hotmail.de --agree-tos --no-eff-email --force-renewal -d schluesselmomente-freiburg.de -d www.schluesselmomente-freiburg.de
+
+configs:
+  nginx_conf:
+    file: ./nginx.conf
+
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+
+networks:
+  app-network:
+    name: app-network
+    external: true
