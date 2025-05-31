@@ -1,0 +1,44 @@
+name: Update reverse-proxy nginx config via SSH
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  ssh_transfer:
+    runs-on: ubuntu-latest
+    steps:  
+    - name: Check out repository code
+      uses: actions/checkout@v3
+      
+    - name: ssh deploy
+      uses: easingthemes/ssh-deploy@v5.0.3
+      with:
+        SSH_PRIVATE_KEY: ${{ secrets.SERVER_PRIVATE_SSH_KEY }}
+        REMOTE_HOST: ${{ secrets.SERVER_ADDRESS }}
+        REMOTE_USER: ${{ secrets.USER_NAME }}
+        REMOTE_PORT: 22
+        TARGET: /opt/schluesselmomente-infra
+        EXCLUDE: /.git/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: ssh_transfer
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_ADDRESS }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.SERVER_PRIVATE_SSH_KEY }}
+          port: 22
+          script: |
+            docker compose up -d certbot || exit 1
+            docker compose stop reverse-proxy || exit 1
+            docker compose up -d reverse-proxy || exit 1
+
