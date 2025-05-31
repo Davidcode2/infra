@@ -38,6 +38,7 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_SSH_KEY }}
           port: 22
           script: |
+            cd /opt/schluesselmomente-infra || exit 1
             docker compose up -d certbot || exit 1
             docker compose stop reverse-proxy || exit 1
             docker compose up -d reverse-proxy || exit 1
