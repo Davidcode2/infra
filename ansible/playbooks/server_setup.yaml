@@ -1,0 +1,204 @@
+- name: Initial Server Setup and Hardening
+  hosts: servers
+  become: true
+
+  vars:
+    ansible_ssh_port: 22
+    new_user: deployuser
+    new_user_groups: ["sudo", "docker"]  # Change to list format for better YAML compatibility
+    allowed_ports:
+      - "22/tcp"
+      - "80/tcp"
+      - "443/tcp"
+    disable_password_auth: true
+    disable_root_login: true
+
+  tasks:
+    - name: Ensure Python is installed (for Ansible modules)
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-is-python3)
+      changed_when: false
+      when: ansible_os_family == "Debian"
+
+    - name: Gather facts (re-run after Python is installed)
+      ansible.builtin.setup:
+      when: ansible_os_family == "Debian"
+
+    - name: Update apt cache and upgrade all packages (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+      when: ansible_os_family == "Debian"
+
+    - name: Update yum cache and upgrade all packages (RHEL/CentOS)
+      ansible.builtin.yum:
+        name: "*"
+        state: latest
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure NTP or Chrony is installed
+      ansible.builtin.package:
+        name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'chrony' }}"
+        state: present
+      notify: Restart time service
+
+    - name: Configure and enable UFW firewall (Debian/Ubuntu)
+      when: ansible_os_family == "Debian"
+      block:
+        - name: Reset UFW rules to defaults
+          community.general.ufw:
+            state: reset
+        - name: Set default UFW policy to deny incoming
+          community.general.ufw:
+            default: deny
+            direction: incoming
+            state: enabled
+        - name: Allow specified ports in UFW
+          community.general.ufw:
+            rule: allow
+            port: "{{ item.split('/')[0] }}"
+            proto: "{{ item.split('/')[1] }}"
+          loop: "{{ allowed_ports }}"
+        - name: Enable UFW
+          community.general.ufw:
+            state: enabled
+          notify: Reload ufw
+
+    - name: Configure and enable Firewalld firewall (RHEL/CentOS)
+      when: ansible_os_family == "RedHat"
+      block:
+        - name: Ensure firewalld is installed and running
+          ansible.builtin.systemd:
+            name: firewalld
+            state: started
+            enabled: yes
+        - name: Allow specified ports in firewalld
+          ansible.posix.firewalld:
+            port: "{{ item }}"
+            state: enabled
+            permanent: true
+            immediate: yes
+          loop: "{{ allowed_ports }}"
+        - name: Reload firewalld
+          ansible.builtin.systemd:
+            name: firewalld
+            state: reloaded
+
+    - name: Ensure docker group exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Create new non-root user
+      ansible.builtin.user:
+        name: "{{ new_user }}"
+        state: present
+        groups: "{{ new_user_groups | join(',') }}"
+        append: yes
+        shell: /bin/bash
+
+    - name: Allow new user to use sudo without password
+      ansible.builtin.lineinfile:
+        path: "/etc/sudoers.d/{{ new_user }}"
+        line: "{{ new_user }} ALL=(ALL) NOPASSWD: ALL"
+        create: yes
+        mode: '0440'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: Set authorized SSH key for new user
+      ansible.posix.authorized_key:
+        user: "{{ new_user }}"
+        state: present
+        key: "{{ ssh_public_key }}"
+
+    - name: Disable password authentication for SSH
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+      when: disable_password_auth
+      notify: Restart sshd
+
+    - name: Disable root login for SSH
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin no'
+        state: present
+      when: disable_root_login
+      notify: Restart sshd
+
+    - name: Install Docker prerequisites (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Add Docker GPG key (Debian/Ubuntu)
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Add Docker APT repository (Debian/Ubuntu)
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release | lower }} stable"
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Docker CE and tools (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+      notify: Start docker
+
+    - name: Check if Docker Compose is already installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/docker-compose
+      register: docker_compose_stat
+
+    - name: Install Docker Compose (standalone binary)
+      ansible.builtin.get_url:
+        url: https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+      when: not docker_compose_stat.stat.exists
+
+    - name: Ensure Docker service is running
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart time service
+      ansible.builtin.systemd:
+        name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'chronyd' }}"
+        state: restarted
+
+    - name: Reload ufw
+      community.general.ufw:
+        state: reloaded
+
+    - name: Restart sshd
+      ansible.builtin.systemd:
+        name: sshd
+        state: restarted
+
+    - name: Start docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: yes
+

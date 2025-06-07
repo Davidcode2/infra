@@ -1,0 +1,95 @@
+events {}
+
+http {
+  # 5mb zone with 10 requests per second per IP
+  limit_req_zone $binary_remote_addr zone=mylimit:5m rate=15r/s;
+
+  server {
+      listen 80;
+      listen [::]:80;
+      root   /var/www/html;
+      server_name teachly.store www.teachly.store schluesselmomente-freiburg www.schluesselmomente-freiburg api.schluesselmomente-freiburg www.api.schluesselmomente-freiburg; 
+      error_page   500 502 503 504  /50x.html;
+
+      location /.well-known/acme-challenge/ {
+        limit_req zone=mylimit burst=5 nodelay;
+        root /var/www/html;
+      }
+
+      location / {
+        limit_req zone=mylimit burst=5 nodelay;
+        return 301 https://$host$request_uri$is_args$args; # Redirect HTTP to HTTPS
+      }
+
+      location ~ /api/(?<section>.+) {
+        limit_req zone=mylimit burst=5 nodelay;
+        proxy_pass $scheme://172.17.0.1:3000/$section$is_args$args;
+      }
+
+      location = /50x.html {
+        limit_req zone=mylimit burst=5 nodelay;
+        root   /var/www/html;
+      }
+  }
+
+  server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name schluesselmomente-freiburg.de www.schluesselmomente-freiburg.de;
+  
+    ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
+  
+    location / {
+        limit_req zone=mylimit burst=30 nodelay;
+        proxy_pass http://schluesselmomente_nginx_proxy:80;
+    }
+  }
+
+  server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name api.schluesselmomente-freiburg.de www.api.schluesselmomente-freiburg.de;
+  
+    ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
+  
+    location / {
+        limit_req zone=mylimit burst=30 nodelay;
+        proxy_pass http://schluesselmomente_nginx_proxy:80;
+    }
+  }
+
+  server {
+      listen 443 ssl;
+      listen [::]:443 ssl;
+      server_name teachly.store www.teachly.store;
+
+      ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
+      ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
+
+      location / {
+          limit_req zone=mylimit burst=5 nodelay;
+          proxy_pass http://frontend:80;
+      }
+  }
+
+  server {
+      listen 443 ssl;
+      listen [::]:443 ssl;
+      server_name auth.teachly.store www.auth.teachly.store;
+
+      proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-Host $host;
+
+      ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
+      ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
+
+      location / {
+          limit_req zone=mylimit burst=5 nodelay;
+          proxy_pass http://keycloak:8080; 
+      }
+  }
+}
+

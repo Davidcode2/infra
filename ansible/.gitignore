@@ -1,0 +1,8 @@
+inventory.ini
+inventory/
+
+*.retry
+*.pem
+*.key
+*.vault
+.secrets/
