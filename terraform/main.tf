@@ -20,8 +20,14 @@ provider "hcloud" {
 }
 
 module "dns" {
- source = "./global/dns"
- droplet_ipv4 = digitalocean_droplet.digitalocean-droplet-1.ipv4_address
+  source                                                    = "./global/dns"
+  droplet_ipv4                                              = digitalocean_droplet.digitalocean-droplet-1.ipv4_address
+  digitalocean_droplet_1_ipv4                               = var.digitalocean_droplet_1_ipv4
+  schluesselmomente_freiburg_de_DKIM_value                  = var.schluesselmomente_freiburg_de_DKIM_value
+  schluesselmomente_freiburg_de_ZMAIL_DKIM_value            = var.schluesselmomente_freiburg_de_ZMAIL_DKIM_value
+  hetzner_cloud_server_1_ipv4                               = var.hetzner_cloud_server_1_ipv4
+  schluesselmomente_freiburg_de_zoho_verification_TXT_value = var.schluesselmomente_freiburg_de_zoho_verification_TXT_value
+  schluesselmomente_freiburg_de_SPF_TXT_value               = var.schluesselmomente_freiburg_de_SPF_TXT_value
 }
 
 resource "digitalocean_droplet" "digitalocean-droplet-1" {

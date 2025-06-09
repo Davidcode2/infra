@@ -1,11 +1,12 @@
-resource "digitalocean_record" "www" {
+resource "digitalocean_record" "jakob_lingel_dev_www_A" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type = "A"
   name = "www"
-  value = var.droplet_ipv4
+  value = "75.2.60.5"
+  ttl    = 3600
 }
 
-resource "digitalocean_record" "root-a" {
+resource "digitalocean_record" "jakob_lingel_dev_A" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "A"
   name   = "@"
@@ -13,15 +14,7 @@ resource "digitalocean_record" "root-a" {
   ttl    = 3600
 }
 
-resource "digitalocean_record" "www-a" {
-  domain = digitalocean_domain.jakob-lingel-dev.name
-  type   = "A"
-  name   = "www"
-  value  = "75.2.60.5"
-  ttl    = 3600
-}
-
-resource "digitalocean_record" "blog-cname" {
+resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "blog"
@@ -29,7 +22,7 @@ resource "digitalocean_record" "blog-cname" {
   ttl    = 43200
 }
 
-resource "digitalocean_record" "www-blog-cname" {
+resource "digitalocean_record" "jakob_lingel_dev_www_blog_CNAME" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "www.blog"
@@ -37,7 +30,7 @@ resource "digitalocean_record" "www-blog-cname" {
   ttl    = 43200
 }
 
-resource "digitalocean_record" "ns1" {
+resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "NS"
   name   = "@"
@@ -45,7 +38,7 @@ resource "digitalocean_record" "ns1" {
   ttl    = 1800
 }
 
-resource "digitalocean_record" "ns2" {
+resource "digitalocean_record" "jakob_lingel_dev_ns2" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "NS"
   name   = "@"
@@ -53,7 +46,7 @@ resource "digitalocean_record" "ns2" {
   ttl    = 1800
 }
 
-resource "digitalocean_record" "ns3" {
+resource "digitalocean_record" "jakob_lingel_dev_ns3" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "NS"
   name   = "@"

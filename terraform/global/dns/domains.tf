@@ -10,3 +10,7 @@ terraform {
 resource "digitalocean_domain" "jakob-lingel-dev" {
   name = "jakob-lingel.dev"
 }
+
+resource "digitalocean_domain" "schluesselmomente_freiburg_de" {
+  name = "schluesselmomente-freiburg.de"
+}
