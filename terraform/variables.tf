@@ -13,7 +13,7 @@ variable "hcloud_token" {
 variable "hcloud_ssh_key" {
   type        = string
   description = "SSH key for Hetzner Cloud"
-  sensitive   = false
+  sensitive   = true
 }
 
 variable "digitalocean_droplet_1_ipv4" {
