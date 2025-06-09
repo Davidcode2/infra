@@ -1,7 +1,7 @@
-variable "droplet_ipv4" {
-  description = "IPv4 address of the main droplet"
-  type        = string
-}
+#variable "droplet_ipv4" {
+#  description = "IPv4 address of the main droplet"
+#  type        = string
+#}
 
 variable digitalocean_droplet_1_ipv4 {
   type        = string

@@ -21,7 +21,6 @@ provider "hcloud" {
 
 module "dns" {
   source                                                    = "./global/dns"
-  droplet_ipv4                                              = digitalocean_droplet.digitalocean-droplet-1.ipv4_address
   digitalocean_droplet_1_ipv4                               = var.digitalocean_droplet_1_ipv4
   schluesselmomente_freiburg_de_DKIM_value                  = var.schluesselmomente_freiburg_de_DKIM_value
   schluesselmomente_freiburg_de_ZMAIL_DKIM_value            = var.schluesselmomente_freiburg_de_ZMAIL_DKIM_value
@@ -31,24 +30,24 @@ module "dns" {
   portfolio_netlify_challenge_txt                           = var.portfolio_netlify_challenge_txt
 }
 
-resource "digitalocean_droplet" "digitalocean-droplet-1" {
-  name   = "digitalocean-droplet-1"
-  region = "fra1"
-  size   = "s-1vcpu-1gb"
-  image  = "ubuntu-22-04-x64"
-}
+#resource "digitalocean_droplet" "digitalocean-droplet-1" {
+#  name   = "digitalocean-droplet-1"
+#  region = "fra1"
+#  size   = "s-1vcpu-1gb"
+#  image  = "ubuntu-22-04-x64"
+#}
+#
+#resource "hcloud_server" "web" {
+#  name        = "hetzner-server"
+#  image       = "ubuntu-22.04"
+#  server_type = "cx11"
+#  location    = "nbg1"
+#
+#  ssh_keys = [hcloud_ssh_key.default.id]
+#}
 
-resource "hcloud_server" "web" {
-  name        = "hetzner-server"
-  image       = "ubuntu-22.04"
-  server_type = "cx11"
-  location    = "nbg1"
-
-  ssh_keys = [hcloud_ssh_key.default.id]
-}
-
-resource "hcloud_ssh_key" "default" {
-  name       = "main-key"
-  public_key = file(var.hcloud_ssh_key_path)
-}
+#resource "hcloud_ssh_key" "default" {
+#  name       = "main-key"
+#  public_key = file(var.hcloud_ssh_key_path)
+#}
 

@@ -45,7 +45,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_api_a" {
   type   = "A"
   name   = "api"
   value  = var.digitalocean_droplet_1_ipv4
-  ttl    = 30
+  ttl    = 3600
 }
 
 resource "digitalocean_record" "schluesselmomente_freiburg_de_admin_a" {
@@ -53,7 +53,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_admin_a" {
   type   = "A"
   name   = "admin"
   value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 30
+  ttl    = 3600
 }
 
 resource "digitalocean_record" "schluesselmomente_freiburg_de_www_admin_a" {
@@ -61,7 +61,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_www_admin_a" {
   type   = "A"
   name   = "www.admin"
   value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 30
+  ttl    = 3600
 }
 
 # TXT records
@@ -94,7 +94,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_s1_dkim_txt" {
   type   = "TXT"
   name   = "s1._domainkey"
   value  = var.schluesselmomente_freiburg_de_DKIM_value
-  ttl    = 30
+  ttl    = 3600
 }
 
 # MX records
