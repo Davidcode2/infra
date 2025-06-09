@@ -102,7 +102,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_mx1" {
   domain   = digitalocean_domain.schluesselmomente_freiburg_de.name
   type     = "MX"
   name     = "@"
-  value    = "mx.zoho.eu"
+  value    = "mx.zoho.eu."
   priority = 10
   ttl      = 3600
 }
@@ -111,7 +111,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_mx2" {
   domain   = digitalocean_domain.schluesselmomente_freiburg_de.name
   type     = "MX"
   name     = "@"
-  value    = "mx2.zoho.eu"
+  value    = "mx2.zoho.eu."
   priority = 20
   ttl      = 3600
 }
@@ -120,7 +120,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_mx3" {
   domain   = digitalocean_domain.schluesselmomente_freiburg_de.name
   type     = "MX"
   name     = "@"
-  value    = "mx3.zoho.eu"
+  value    = "mx3.zoho.eu."
   priority = 50
   ttl      = 3600
 }

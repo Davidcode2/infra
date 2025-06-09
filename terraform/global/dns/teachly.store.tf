@@ -3,7 +3,7 @@ resource "digitalocean_record" "teachly_store_ns1" {
   domain = digitalocean_domain.teachly_store.name
   type   = "NS"
   name   = "@"
-  value  = "ns1.digitalocean.com"
+  value  = "ns1.digitalocean.com."
   ttl    = 1800
 }
 
@@ -11,7 +11,7 @@ resource "digitalocean_record" "teachly_store_ns2" {
   domain = digitalocean_domain.teachly_store.name
   type   = "NS"
   name   = "@"
-  value  = "ns2.digitalocean.com"
+  value  = "ns2.digitalocean.com."
   ttl    = 1800
 }
 
@@ -19,7 +19,7 @@ resource "digitalocean_record" "teachly_store_ns3" {
   domain = digitalocean_domain.teachly_store.name
   type   = "NS"
   name   = "@"
-  value  = "ns3.digitalocean.com"
+  value  = "ns3.digitalocean.com."
   ttl    = 1800
 }
 
@@ -77,7 +77,7 @@ resource "digitalocean_record" "teachly_store_portfolio_cname" {
   domain = digitalocean_domain.teachly_store.name
   type   = "CNAME"
   name   = "portfolio"
-  value  = "clever-pasca-29d973.netlify.app"
+  value  = "clever-pasca-29d973.netlify.app."
   ttl    = 43200
 }
 
