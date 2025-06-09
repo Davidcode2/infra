@@ -30,24 +30,25 @@ module "dns" {
   portfolio_netlify_challenge_txt                           = var.portfolio_netlify_challenge_txt
 }
 
-#resource "digitalocean_droplet" "digitalocean-droplet-1" {
-#  name   = "digitalocean-droplet-1"
-#  region = "fra1"
-#  size   = "s-1vcpu-1gb"
-#  image  = "ubuntu-22-04-x64"
-#}
-#
-#resource "hcloud_server" "web" {
-#  name        = "hetzner-server"
-#  image       = "ubuntu-22.04"
-#  server_type = "cx11"
-#  location    = "nbg1"
-#
-#  ssh_keys = [hcloud_ssh_key.default.id]
-#}
+resource "digitalocean_droplet" "jakobsOceanVM" {
+  name       = "jakobsOceanVM"
+  region     = "fra1"
+  size       = "s-1vcpu-2gb"
+  image      = "142476112"
+  monitoring = true
 
-#resource "hcloud_ssh_key" "default" {
-#  name       = "main-key"
-#  public_key = file(var.hcloud_ssh_key_path)
-#}
+  vpc_uuid = "94463b0e-551f-4943-b13d-ef8d1f5fcc27"
+}
+
+resource "hcloud_server" "hetzner_ubuntu-4gb-nbg1-1" {
+  name        = "ubuntu-4gb-nbg1-1"
+  image       = "ubuntu-24.04"
+  server_type = "cx22"
+  location    = "nbg1"
+}
+
+resource "hcloud_ssh_key" "hetzner_ssh_key" {
+  name       = "hetzner-1"
+  public_key = var.hcloud_ssh_key
+}
 

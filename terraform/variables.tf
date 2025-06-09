@@ -10,10 +10,10 @@ variable "hcloud_token" {
   sensitive   = true
 }
 
-variable "hcloud_ssh_key_path" {
+variable "hcloud_ssh_key" {
   type        = string
-  description = "Path to the SSH key for Hetzner Cloud"
-  sensitive   = true
+  description = "SSH key for Hetzner Cloud"
+  sensitive   = false
 }
 
 variable "digitalocean_droplet_1_ipv4" {

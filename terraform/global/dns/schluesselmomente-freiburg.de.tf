@@ -124,4 +124,3 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_mx3" {
   priority = 50
   ttl      = 3600
 }
-
