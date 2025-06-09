@@ -14,3 +14,7 @@ resource "digitalocean_domain" "jakob-lingel-dev" {
 resource "digitalocean_domain" "schluesselmomente_freiburg_de" {
   name = "schluesselmomente-freiburg.de"
 }
+
+resource "digitalocean_domain" "teachly_store" {
+  name = "teachly.store"
+}

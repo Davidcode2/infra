@@ -51,3 +51,9 @@ variable "schluesselmomente_freiburg_de_zoho_verification_TXT_value" {
   description = "SPF TXT value for schluesselmomente-freiburg.de domain"
   sensitive   = true
 }
+
+variable "portfolio_netlify_challenge_txt" {
+  type        = string
+  description = "Netlify challenge TXT value for portfolio on netlify domain"
+  sensitive   = true
+}

@@ -28,6 +28,7 @@ module "dns" {
   hetzner_cloud_server_1_ipv4                               = var.hetzner_cloud_server_1_ipv4
   schluesselmomente_freiburg_de_zoho_verification_TXT_value = var.schluesselmomente_freiburg_de_zoho_verification_TXT_value
   schluesselmomente_freiburg_de_SPF_TXT_value               = var.schluesselmomente_freiburg_de_SPF_TXT_value
+  portfolio_netlify_challenge_txt                           = var.portfolio_netlify_challenge_txt
 }
 
 resource "digitalocean_droplet" "digitalocean-droplet-1" {
