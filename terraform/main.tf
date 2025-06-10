@@ -8,6 +8,10 @@ terraform {
       source  = "hetznercloud/hcloud"
       version = "~> 1.44"
     }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
   }
 }
 
@@ -18,6 +22,12 @@ provider "digitalocean" {
 provider "hcloud" {
   token = var.hcloud_token
 }
+
+# Configure the AWS Provider
+provider "aws" {
+  region = "eu-central-1"
+}
+
 
 module "dns" {
   source                                                    = "./global/dns"
@@ -52,3 +62,8 @@ resource "hcloud_ssh_key" "hetzner_ssh_key" {
   public_key = var.hcloud_ssh_key
 }
 
+resource "aws_iam_openid_connect_provider" "github" {
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = []
+}
