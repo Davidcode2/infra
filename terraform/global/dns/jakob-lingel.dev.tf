@@ -14,6 +14,14 @@ resource "digitalocean_record" "jakob_lingel_dev_A" {
   ttl    = 3600
 }
 
+resource "digitalocean_record" "jakob_lingel_dev_immoly_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "immoly"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 30
+}
+
 resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
@@ -30,6 +38,7 @@ resource "digitalocean_record" "jakob_lingel_dev_www_blog_CNAME" {
   ttl    = 43200
 }
 
+# NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "NS"
