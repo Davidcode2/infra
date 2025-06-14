@@ -40,8 +40,8 @@ module "dns" {
 }
 
 module "schluesselmomente" {
-  source = "./projects"
-  hetzner_cloud_server_1_ipv4                               = var.hetzner_cloud_server_1_ipv4
+  source                      = "./projects"
+  hetzner_cloud_server_1_ipv4 = var.hetzner_cloud_server_1_ipv4
 }
 
 # compute
@@ -66,25 +66,3 @@ resource "hcloud_ssh_key" "hetzner_ssh_key" {
   name       = "hetzner-1"
   public_key = var.hcloud_ssh_key
 }
-
-resource "aws_iam_role" "ci-role" {
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "ssm.amazonaws.com"
-        }
-        Action = "ssm:GetParameter"
-        Resource = "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/schluesselmomente/*"
-      }
-    ]
-  })
-}
-
-#resource "aws_iam_openid_connect_provider" "github" {
-#  url             = "https://token.actions.githubusercontent.com"
-#  client_id_list  = ["sts.amazonaws.com"]
-#  thumbprint_list = []
-#}
