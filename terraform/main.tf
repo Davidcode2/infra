@@ -23,11 +23,10 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 
-# Configure the AWS Provider
 provider "aws" {
-  region = "eu-central-1"
+  region  = "eu-central-1"
+  profile = "admin"
 }
-
 
 module "dns" {
   source                                                    = "./global/dns"
@@ -40,6 +39,7 @@ module "dns" {
   portfolio_netlify_challenge_txt                           = var.portfolio_netlify_challenge_txt
 }
 
+# compute
 resource "digitalocean_droplet" "jakobsOceanVM" {
   name       = "jakobsOceanVM"
   region     = "fra1"
