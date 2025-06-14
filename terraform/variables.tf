@@ -57,3 +57,9 @@ variable "portfolio_netlify_challenge_txt" {
   description = "Netlify challenge TXT value for portfolio on netlify domain"
   sensitive   = true
 }
+
+variable "aws_account_id" {
+  type        = string
+  description = "AWS account ID"
+  sensitive   = true
+}
