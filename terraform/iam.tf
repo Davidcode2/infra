@@ -11,7 +11,7 @@ resource "aws_iam_role" "ci-role" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:davidcode2/blog:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" = "repo:Davidcode2/blog:ref:refs/heads/main"
           },
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
@@ -36,7 +36,10 @@ resource "aws_iam_role_policy" "ci-policy" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        Resource = "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/schluesselmomente/*"
+        Resource = [
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/ssh/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*"
+        ]
       }
     ]
   })
