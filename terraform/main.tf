@@ -78,8 +78,4 @@ resource "tls_private_key" "hetzner_private_key" {
 resource "hcloud_ssh_key" "deployment_key" {
   name       = "deployment-key"
   public_key = tls_private_key.hetzner_private_key.public_key_openssh
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
