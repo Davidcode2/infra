@@ -25,3 +25,15 @@ resource "aws_ssm_parameter" "hetzner_cloud_server_1_private_ssh_key" {
     Project     = local.server_name
   }
 }
+
+resource "aws_ssm_parameter" "hetzner_cloud_server_1_openssl_private_ssh_key" {
+  name        = "/ssh/${local.server_name}/openssl_deployment_private_ssh_key"
+  description = "Private SSH key for ${local.server_name}"
+  type        = "SecureString"
+  value       = "dummy"
+
+  tags = {
+    Environment = "Production"
+    Project     = local.server_name
+  }
+}
