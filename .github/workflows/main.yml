@@ -29,7 +29,7 @@ jobs:
         REMOTE_HOST: ${{ secrets.SERVER_ADDRESS }}
         REMOTE_USER: ${{ secrets.USER_NAME }}
         REMOTE_PORT: 22
-        TARGET: ${{ env.DEPLOYMENT_PATH }} # Use the environment variable
+        TARGET: ${{ env.DEPLOYMENT_PATH }}
         EXCLUDE: /.git/
 
   deploy:
@@ -55,7 +55,7 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_SSH_KEY }}
           port: 22
           script: |
-            cd ${{ env.DEPLOYMENT_PATH }} || exit 1 # Use the environment variable
+            cd ${{ env.DEPLOYMENT_PATH }} || exit 1
             docker compose up -d certbot || exit 1
             docker compose stop reverse-proxy || exit 1
             docker compose up -d reverse-proxy || exit 1
