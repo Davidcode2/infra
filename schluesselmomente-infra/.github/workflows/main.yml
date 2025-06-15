@@ -13,7 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Configure sparse checkout
+      run: |
+        git sparse-checkout init --cone
+        git sparse-checkout set schluesselmomente-infra
 
     - name: ssh deploy
       uses: easingthemes/ssh-deploy@v5.0.3
@@ -32,6 +39,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Configure sparse checkout
+        run: |
+          git sparse-checkout init --cone
+          git sparse-checkout set schluesselmomente-infra
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1
