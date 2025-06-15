@@ -31,6 +31,9 @@ resource "aws_ssm_parameter" "hetzner_cloud_server_1_openssl_private_ssh_key" {
   description = "Private SSH key for ${local.server_name}"
   type        = "SecureString"
   value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
 
   tags = {
     Environment = "Production"

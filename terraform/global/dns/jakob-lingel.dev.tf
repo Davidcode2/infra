@@ -3,7 +3,7 @@ resource "digitalocean_record" "jakob_lingel_dev_www_A" {
   type = "A"
   name = "www"
   value = var.hetzner_cloud_server_1_ipv4
-  ttl    = 3600
+  ttl    = 30
 }
 
 resource "digitalocean_record" "jakob_lingel_dev_A" {
@@ -11,7 +11,7 @@ resource "digitalocean_record" "jakob_lingel_dev_A" {
   type   = "A"
   name   = "@"
   value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 3600
+  ttl    = 30
 }
 
 resource "digitalocean_record" "jakob_lingel_dev_immoly_CNAME" {
@@ -20,22 +20,6 @@ resource "digitalocean_record" "jakob_lingel_dev_immoly_CNAME" {
   name   = "immoly"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
   ttl    = 30
-}
-
-resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
-  domain = digitalocean_domain.jakob-lingel-dev.name
-  type   = "CNAME"
-  name   = "blog"
-  value  = "apex-loadbalancer.netlify.com."
-  ttl    = 43200
-}
-
-resource "digitalocean_record" "jakob_lingel_dev_www_blog_CNAME" {
-  domain = digitalocean_domain.jakob-lingel-dev.name
-  type   = "CNAME"
-  name   = "www.blog"
-  value  = "apex-loadbalancer.netlify.com."
-  ttl    = 43200
 }
 
 # NS records
