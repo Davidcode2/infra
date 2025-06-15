@@ -1,0 +1,7 @@
+# playbooks/deploy_nginx.yml
+- name: Deploy Nginx reverse proxy configuration
+  hosts: servers
+  become: true # Execute tasks with sudo privileges
+
+  roles:
+    - nginx # This is the name of your Ansible role

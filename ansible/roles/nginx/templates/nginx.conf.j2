@@ -1,95 +1,82 @@
+# This is an Ansible Jinja2 template for Nginx configuration.
+# It leverages variables defined in your Ansible playbook or role defaults
+# to dynamically generate server blocks for different domains and services.
+
 events {}
 
 http {
-  # 5mb zone with 10 requests per second per IP
+  # Global Nginx settings and rate limiting zones
+  # 5mb zone with 15 requests per second per IP (increased from 10r/s)
   limit_req_zone $binary_remote_addr zone=mylimit:5m rate=15r/s;
 
+  # --- HTTP (Port 80) Server Block ---
+  # This block handles all HTTP traffic and redirects it to HTTPS,
+  # except for Certbot's well-known challenge path.
   server {
       listen 80;
       listen [::]:80;
-      root   /var/www/html;
-      server_name teachly.store www.teachly.store schluesselmomente-freiburg www.schluesselmomente-freiburg api.schluesselmomente-freiburg www.api.schluesselmomente-freiburg; 
-      error_page   500 502 503 504  /50x.html;
+      root    /var/www/html;
+      # Dynamically list all domains from your defined virtual hosts for this catch-all block
+      server_name {{ nginx_vhosts | map(attribute='domains') | flatten | join(' ') }};
 
+      error_page  500 502 503 504  /50x.html;
+
+      # Location block for Certbot's ACME challenge
       location /.well-known/acme-challenge/ {
         limit_req zone=mylimit burst=5 nodelay;
         root /var/www/html;
       }
 
+      # Default location to redirect all other HTTP traffic to HTTPS
       location / {
         limit_req zone=mylimit burst=5 nodelay;
         return 301 https://$host$request_uri$is_args$args; # Redirect HTTP to HTTPS
       }
 
-      location ~ /api/(?<section>.+) {
-        limit_req zone=mylimit burst=5 nodelay;
-        proxy_pass $scheme://172.17.0.1:3000/$section$is_args$args;
-      }
-
+      # Error page location
       location = /50x.html {
         limit_req zone=mylimit burst=5 nodelay;
-        root   /var/www/html;
+        root    /var/www/html;
       }
   }
 
+  # --- HTTPS (Port 443) Server Blocks Loop ---
+  # This loop iterates through each defined virtual host in 'nginx_vhosts'
+  # to create a dedicated HTTPS server block for it.
+  {% for vhost in nginx_vhosts %}
   server {
     listen 443 ssl;
     listen [::]:443 ssl;
-    server_name schluesselmomente-freiburg.de www.schluesselmomente-freiburg.de;
-  
-    ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
-  
+    # Dynamically set server_name for this specific virtual host
+    server_name {{ vhost.domains | join(' ') }};
+
+    # Set SSL certificate and key paths based on 'cert_domain'
+    ssl_certificate /etc/letsencrypt/live/{{ vhost.cert_domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ vhost.cert_domain }}/privkey.pem;
+
+    # Include any extra headers defined for this virtual host
+    {% if vhost.extra_headers is defined and vhost.extra_headers %}
+      {% for header in vhost.extra_headers %}
+        {{ header }}
+      {% endfor %}
+    {% endif %}
+
+    # Default location to proxy pass to the backend for general traffic
     location / {
-        limit_req zone=mylimit burst=30 nodelay;
-        proxy_pass http://schluesselmomente_nginx_proxy:80;
+      limit_req zone=mylimit burst=30 nodelay;
+      proxy_pass {{ vhost.proxy_target_443 }};
     }
-  }
 
-  server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    server_name api.schluesselmomente-freiburg.de www.api.schluesselmomente-freiburg.de;
-  
-    ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
-  
-    location / {
-        limit_req zone=mylimit burst=30 nodelay;
-        proxy_pass http://schluesselmomente_nginx_proxy:80;
+    # Conditional inclusion of an API specific location block
+    # This block is only included if 'is_api_domain' is set to true for the current vhost.
+    {% if vhost.is_api_domain %}
+    # Specific API location block for this API domain
+    location ~ /api/(?<section>.+) {
+      limit_req zone=mylimit burst=5 nodelay;
+      # Use a specific API proxy target if defined, otherwise fall back to the default 443 target
+      proxy_pass {{ vhost.api_proxy_target_443 | default(vhost.proxy_target_443) }}/$section$is_args$args;
     }
+    {% endif %}
   }
-
-  server {
-      listen 443 ssl;
-      listen [::]:443 ssl;
-      server_name teachly.store www.teachly.store;
-
-      ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
-      ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
-
-      location / {
-          limit_req zone=mylimit burst=5 nodelay;
-          proxy_pass http://frontend:80;
-      }
-  }
-
-  server {
-      listen 443 ssl;
-      listen [::]:443 ssl;
-      server_name auth.teachly.store www.auth.teachly.store;
-
-      proxy_set_header X-Forwarded-For $proxy_protocol_addr;
-      proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_set_header X-Forwarded-Host $host;
-
-      ssl_certificate /etc/letsencrypt/live/teachly.store/fullchain.pem;
-      ssl_certificate_key /etc/letsencrypt/live/teachly.store/privkey.pem;
-
-      location / {
-          limit_req zone=mylimit burst=5 nodelay;
-          proxy_pass http://keycloak:8080; 
-      }
-  }
+  {% endfor %}
 }
-

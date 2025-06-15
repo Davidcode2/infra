@@ -1,0 +1,39 @@
+# roles/nginx_config/defaults/main.yml
+
+# Define your Nginx virtual hosts configurations
+# Each entry represents a distinct set of domains and their associated settings.
+nginx_vhosts:
+  - name: teachly_main_site
+    domains:
+      - teachly.store
+      - www.teachly.store
+    cert_domain: teachly.store # The base domain name for SSL certificate path (e.g., /etc/letsencrypt/live/teachly.store/)
+    proxy_target_443: "http://frontend:80" # Backend target for HTTPS traffic for this virtual host
+    is_api_domain: false # Set to 'true' if this domain needs a specific '/api/' location block
+
+  - name: teachly_auth_service
+    domains:
+      - auth.teachly.store
+      - www.auth.teachly.store
+    cert_domain: teachly.store
+    proxy_target_443: "http://keycloak:8080"
+    is_api_domain: false
+    extra_headers:
+      - "proxy_set_header X-Forwarded-For $proxy_protocol_addr;"
+      - "proxy_set_header X-Forwarded-Proto $scheme;"
+      - "proxy_set_header X-Forwarded-Host $host;"
+
+  - name: schluesselmomente_main_site
+    domains:
+      - schluesselmomente-freiburg.de
+      - www.schluesselmomente-freiburg.de
+    cert_domain: schluesselmomente-freiburg.de
+    proxy_target_443: "http://schluesselmomente_nginx_proxy:80"
+    is_api_domain: false
+
+  - name: schluesselmomente_admin_service
+    domains:
+      - admin.schluesselmomente-freiburg.de
+      - www.admin.schluesselmomente-freiburg.de
+    cert_domain: admin.schluesselmomente-freiburg.de
+    proxy_target_443: "http://schluesselmomente-cms:80" # Default backend for general traffic on this domain

@@ -1,0 +1,13 @@
+# roles/nginx_config/handlers/main.yml
+- name: validate nginx config
+  ansible.builtin.command: nginx -t
+  register: nginx_test_result
+  changed_when: nginx_test_result.rc != 0
+  failed_when: nginx_test_result.rc != 0
+  listen: "validate nginx config" # This name matches the 'notify' in tasks/main.yml
+
+- name: reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  listen: "reload nginx" # This name matches the 'notify' in tasks/main.yml

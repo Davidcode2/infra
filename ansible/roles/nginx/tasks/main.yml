@@ -1,0 +1,32 @@
+- name: Ensure Nginx is installed (example task, adapt as needed)
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Create Nginx sites-available directory if it doesn't exist
+  ansible.builtin.file:
+    path: /etc/nginx
+    state: directory
+    mode: '0755'
+
+- name: Deploy Nginx reverse proxy configuration
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - validate nginx config
+    - reload nginx
+
+- name: Ensure symbolic link for default site is present
+  ansible.builtin.file:
+    src: /etc/nginx/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    state: link
+    force: true
+  notify:
+    - validate nginx config
+    - reload nginx
