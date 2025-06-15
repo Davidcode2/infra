@@ -7,6 +7,7 @@ on:
 
 env:
   DEPLOYMENT_PATH: /opt/deployments/infra
+  REVERSE_PROXY_PATH: reverse_proxy
 
 jobs:
   ssh_transfer:
@@ -20,7 +21,7 @@ jobs:
     - name: Configure sparse checkout
       run: |
         git sparse-checkout init --cone
-        git sparse-checkout set schluesselmomente-infra
+        git sparse-checkout set ${{ env.REVERSE_PROXY_PATH }}
 
     - name: ssh deploy
       uses: easingthemes/ssh-deploy@v5.0.3
@@ -45,7 +46,7 @@ jobs:
       - name: Configure sparse checkout
         run: |
           git sparse-checkout init --cone
-          git sparse-checkout set schluesselmomente-infra
+          git sparse-checkout set ${{ env.REVERSE_PROXY_PATH }}
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1
