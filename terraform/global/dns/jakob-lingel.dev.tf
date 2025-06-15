@@ -2,7 +2,7 @@ resource "digitalocean_record" "jakob_lingel_dev_www_A" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type = "A"
   name = "www"
-  value = "75.2.60.5"
+  value = var.hetzner_cloud_server_1_ipv4
   ttl    = 3600
 }
 
@@ -10,7 +10,7 @@ resource "digitalocean_record" "jakob_lingel_dev_A" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "A"
   name   = "@"
-  value  = "75.2.60.5"
+  value  = var.hetzner_cloud_server_1_ipv4
   ttl    = 3600
 }
 
