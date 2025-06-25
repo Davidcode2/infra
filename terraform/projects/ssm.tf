@@ -40,3 +40,33 @@ resource "aws_ssm_parameter" "hetzner_cloud_server_1_openssl_private_ssh_key" {
     Project     = local.server_name
   }
 }
+
+resource "aws_ssm_parameter" "immoly_db_user" {
+  name        = "/immoly/db/user"
+  description = "Database user for immoly"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "immoly_db_password" {
+  name        = "/immoly/db/password"
+  description = "Database password for immoly"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "immoly_db_name" {
+  name        = "/immoly/db/name"
+  description = "Database name for immoly"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
