@@ -56,7 +56,7 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_SSH_KEY }}
           port: 22
           script: |
-            cd ${{ env.DEPLOYMENT_PATH }} || exit 1
+            cd ${{ env.DEPLOYMENT_PATH }}/${{ env.REVERSE_PROXY_PATH }} || exit 1
             docker compose up -d certbot || exit 1
             docker compose stop reverse-proxy || exit 1
             docker compose up -d reverse-proxy || exit 1
