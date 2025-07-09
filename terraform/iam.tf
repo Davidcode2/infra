@@ -41,8 +41,8 @@ resource "aws_iam_role_policy" "ci-policy" {
         ]
         Resource = [
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/ssh/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*"
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly/*"
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly*"
         ]
       }
     ]
