@@ -4,10 +4,9 @@ services:
     container_name: reverse_proxy_for_certbot
     configs:
       - source: nginx_certonly_conf
-        target: /etc/nginx/nginx.certonly.conf
+        target: /etc/nginx/nginx.conf
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
