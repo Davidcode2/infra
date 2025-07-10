@@ -1,4 +1,20 @@
 services:
+  reverse-proxy-certonly:
+    image: nginx:alpine
+    container_name: reverse_proxy_for_certbot
+    configs:
+      - source: nginx_certonly_conf
+        target: /etc/nginx/nginx.certonly.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    networks:
+      - app-network
+
   reverse-proxy:
     image: nginx:alpine
     container_name: reverse_proxy
@@ -30,6 +46,8 @@ services:
 configs:
   nginx_conf:
     file: ./nginx.conf
+  nginx_certonly_conf:
+    file: ./nginx.certonly.conf
 
 volumes:
   certbot-etc:
