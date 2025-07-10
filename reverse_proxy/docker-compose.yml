@@ -24,7 +24,7 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - web-root:/var/www/html
-    command: certonly -v --webroot --webroot-path=/var/www/html --email jakob.lingel@hotmail.de --agree-tos --no-eff-email --force-renewal -d admin.schluesselmomente-freiburg.de -d immoly.jakob-lingel.dev jakob-lingel.dev
+    command: certonly -v --webroot --webroot-path=/var/www/html --email jakob.lingel@hotmail.de --agree-tos --no-eff-email --force-renewal -d admin.schluesselmomente-freiburg.de -d immoly.jakob-lingel.dev -d jakob-lingel.dev
 
   reverse-proxy:
     image: nginx:alpine
