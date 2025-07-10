@@ -15,9 +15,23 @@ services:
     networks:
       - app-network
 
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - reverse-proxy-certonly
+    command: certonly -v --webroot --webroot-path=/var/www/html --email jakob.lingel@hotmail.de --agree-tos --no-eff-email --force-renewal -d admin.schluesselmomente-freiburg.de -d immoly.jakob-lingel.dev
+
   reverse-proxy:
     image: nginx:alpine
     container_name: reverse_proxy
+    depends_on: 
+      certbot:
+        condition: service_completed_successfully
     configs:
       - source: nginx_conf
         target: /etc/nginx/nginx.conf
@@ -31,17 +45,6 @@ services:
       - web-root:/var/www/html
     networks:
       - app-network
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - web-root:/var/www/html
-    depends_on:
-      - reverse-proxy
-    command: certonly -v --webroot --webroot-path=/var/www/html --email jakob.lingel@hotmail.de --agree-tos --no-eff-email --force-renewal -d admin.schluesselmomente-freiburg.de -d immoly.jakob-lingel.dev
 
 configs:
   nginx_conf:
