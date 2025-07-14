@@ -28,7 +28,9 @@ services:
       certonly -vvv --webroot
       --webroot-path=/var/www/html
       --email jakob.lingel@hotmail.de
-      --agree-tos --no-eff-email
+      --non-interactive
+      --agree-tos 
+      --no-eff-email
       --cert-name legit-certificate
       -d admin.schluesselmomente-freiburg.de
       -d jakob-lingel.dev
@@ -46,10 +48,32 @@ services:
     ports:
       - "443:443"
     volumes:
+      - certbot-etc:/etc/letsencrypt:ro
+      - certbot-var:/var/lib/letsencrypt:ro
+      - web-root:/var/www/html:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  certbot-renewal-manager: 
+    image: certbot/certbot
+    container_name: certbot_renewal_manager
+    volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
-      # if the certificate has expired, uncomment the below line and run "docker compose up -d"
       - web-root:/var/www/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: >
+      sh -c "echo 'Starting Certbot renewal loop...';
+      trap exit TERM;
+      while :; do
+        certbot renew --deploy-hook 'docker exec reverse_proxy nginx -s reload';
+        sleep 720h & wait $$!;
+      done;"
+    restart: unless-stopped
+    depends_on:
+      reverse-proxy:
+        condition: service_started
     networks:
       - app-network
 
