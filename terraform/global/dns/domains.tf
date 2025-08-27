@@ -18,3 +18,7 @@ resource "digitalocean_domain" "schluesselmomente_freiburg_de" {
 resource "digitalocean_domain" "teachly_store" {
   name = "teachly.store"
 }
+
+resource "digitalocean_domain" "mimis_kreativstudio_de" {
+  name = "mimis-kreativstudio.de"
+}
