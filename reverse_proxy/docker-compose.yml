@@ -35,6 +35,7 @@ services:
       -d admin.schluesselmomente-freiburg.de
       -d jakob-lingel.dev
       -d immoly.jakob-lingel.dev
+      -d mimis-kreativstudio.de
 
   reverse-proxy:
     image: nginx:alpine
