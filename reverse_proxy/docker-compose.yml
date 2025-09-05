@@ -36,6 +36,7 @@ services:
       -d jakob-lingel.dev
       -d immoly.jakob-lingel.dev
       -d mimis-kreativstudio.de
+      -d alemazung.jakob-lingel.dev
 
   reverse-proxy:
     image: nginx:alpine

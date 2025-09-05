@@ -14,12 +14,22 @@ resource "digitalocean_record" "jakob_lingel_dev_A" {
   ttl    = 30
 }
 
+# immoly CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_immoly_CNAME" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "immoly"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
   ttl    = 30
+}
+
+# alemazung CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_alemazung" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "alemazung"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
 }
 
 # NS records
@@ -46,3 +56,4 @@ resource "digitalocean_record" "jakob_lingel_dev_ns3" {
   value  = "ns3.digitalocean.com."
   ttl    = 1800
 }
+
