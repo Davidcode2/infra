@@ -13,7 +13,8 @@ resource "aws_iam_role" "ci-role" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:Davidcode2/blog:ref:refs/heads/main",
-              "repo:Davidcode2/immoly:ref:refs/heads/main"
+              "repo:Davidcode2/immoly:ref:refs/heads/main",
+              "repo:Davidcode2/joy_alemazung:ref:refs/heads/main"
             ]
           },
           StringEquals = {
@@ -42,7 +43,8 @@ resource "aws_iam_role_policy" "ci-policy" {
         Resource = [
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/ssh/*",
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly*"
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/joy_alemazung*"
         ]
       }
     ]
