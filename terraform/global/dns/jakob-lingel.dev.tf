@@ -23,13 +23,22 @@ resource "digitalocean_record" "jakob_lingel_dev_immoly_CNAME" {
   ttl    = 1800
 }
 
+# blog CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "blog"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 30
+}
+
 # google search ownership verification TXT record for immoly
 resource "digitalocean_record" "jakob_lingel_dev_immoly_google_verification" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "TXT"
-  name   = "immoly"
+  name   = "@"
   value  = "google-site-verification=-rHm-rqCZBUxj6dSYIX1j722sREMP0wNw9gDLQDWn_Q"
-  ttl    = 30
+  ttl    = 1800
 }
 
 # alemazung CNAME record
