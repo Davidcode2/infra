@@ -3,7 +3,7 @@ resource "digitalocean_record" "jakob_lingel_dev_www_A" {
   type = "A"
   name = "www"
   value = var.hetzner_cloud_server_1_ipv4
-  ttl    = 30
+  ttl    = 1800
 }
 
 resource "digitalocean_record" "jakob_lingel_dev_A" {
@@ -11,7 +11,7 @@ resource "digitalocean_record" "jakob_lingel_dev_A" {
   type   = "A"
   name   = "@"
   value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 30
+  ttl    = 1800
 }
 
 # immoly CNAME record
@@ -20,7 +20,7 @@ resource "digitalocean_record" "jakob_lingel_dev_immoly_CNAME" {
   type   = "CNAME"
   name   = "immoly"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # alemazung CNAME record
@@ -30,6 +30,15 @@ resource "digitalocean_record" "jakob_lingel_dev_alemazung" {
   name   = "alemazung"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
   ttl    = 1800
+}
+
+# analytics CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_analytics" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "analytics"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 30
 }
 
 # NS records
