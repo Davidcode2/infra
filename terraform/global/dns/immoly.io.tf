@@ -23,6 +23,15 @@ resource "digitalocean_record" "immoly_io_blog_CNAME" {
   ttl    = 30
 }
 
+# google search ownership verification TXT record for immoly
+resource "digitalocean_record" "immoly_io_google_verification" {
+  domain = digitalocean_domain.immoly-io.name
+  type   = "TXT"
+  name   = "@"
+  value  = "google-site-verification=4JEzmJ-pAhowMTRZCZNCTa-nrL2HKT3casSXqD21GZc"
+  ttl    = 1800
+}
+
 # NS records
 resource "digitalocean_record" "immoly_io_ns1" {
   domain = digitalocean_domain.immoly-io.name
