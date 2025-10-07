@@ -34,6 +34,7 @@ services:
       --cert-name legit-certificate
       -d admin.schluesselmomente-freiburg.de
       -d jakob-lingel.dev
+      -d immoly.jakob-lingel.dev
       -d mimis-kreativstudio.de
       -d alemazung.jakob-lingel.dev
       -d analytics.jakob-lingel.dev
