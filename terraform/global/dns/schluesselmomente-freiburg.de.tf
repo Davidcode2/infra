@@ -28,7 +28,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_root_a" {
   domain = digitalocean_domain.schluesselmomente_freiburg_de.name
   type   = "A"
   name   = "@"
-  value  = var.digitalocean_droplet_1_ipv4
+  value = var.hetzner_cloud_server_1_ipv4
   ttl    = 3600
 }
 
@@ -36,7 +36,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_www_a" {
   domain = digitalocean_domain.schluesselmomente_freiburg_de.name
   type   = "A"
   name   = "www"
-  value  = var.digitalocean_droplet_1_ipv4
+  value = var.hetzner_cloud_server_1_ipv4
   ttl    = 3600
 }
 
@@ -44,7 +44,7 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_api_a" {
   domain = digitalocean_domain.schluesselmomente_freiburg_de.name
   type   = "A"
   name   = "api"
-  value  = var.digitalocean_droplet_1_ipv4
+  value  = var.hetzner_cloud_server_1_ipv4
   ttl    = 3600
 }
 
