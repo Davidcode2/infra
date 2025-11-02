@@ -11,7 +11,7 @@ output "server_private_ips" {
 # This resource generates the inventory.ini file
 resource "local_file" "ansible_inventory" {
   # The content comes from the template file
-  content = templatefile("${path.module}/../ansible/inventory/inventory.ini.tfpl", {
+  content = templatefile("${path.module}/inventory.ini.tfpl", {
     # Pass Terraform data into the template
     lb_ip   = hcloud_load_balancer.k8s_lb.ipv4
     masters = [
