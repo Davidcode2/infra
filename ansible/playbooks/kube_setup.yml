@@ -27,9 +27,10 @@
         flat: yes
 
     - name: Replace localhost with Load Balancer IP in local kubeconfig
-      ansible.builtin.local_action:
+      local_action:
         module: ansible.builtin.replace
         path: "kubeconfig-{{ load_balancer_ip }}.yaml"
         regexp: '127\.0\.0\.1'
         replace: '{{ load_balancer_ip }}'
       run_once: true
+      become: false
