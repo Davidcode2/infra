@@ -144,3 +144,17 @@ resource "hcloud_load_balancer_service" "lb_https" {
   listen_port      = 443
   destination_port = 30443 # Example port for Kubernetes NodePort
 }
+
+resource "hcloud_load_balancer_service" "lb_kube_api" {
+  load_balancer_id = hcloud_load_balancer.k8s_lb.id
+  protocol         = "tcp"
+  listen_port      = 6443 # External port
+  destination_port = 6443 # Internal port on the nodes (K3s default)
+}
+
+resource "hcloud_load_balancer_target" "kube_api_target" {
+  count            = length(hcloud_server.k8s_node)
+  load_balancer_id = hcloud_load_balancer.k8s_lb.id
+  type             = "server"
+  server_id        = hcloud_server.k8s_node[count.index].id
+}
