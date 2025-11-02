@@ -63,3 +63,9 @@ variable "aws_account_id" {
   description = "AWS account ID"
   sensitive   = true
 }
+
+variable "ssh_private_key_path" {
+  type        = string
+  description = "Path to the SSH private key"
+  sensitive   = true
+}

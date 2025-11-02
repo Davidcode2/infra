@@ -1,0 +1,9 @@
+---
+- name: 1. Install k3s on joining server nodes
+  ansible.builtin.shell: >
+    curl -sfL https://get.k3s.io | sh -s - server
+    --server https://{{ k3s_init_node_ip }}:6443
+    --token {{ hostvars[groups['k3s_master_init'][0]]['k3s_token'] }}
+    --tls-san {{ load_balancer_ip }}
+  args:
+    creates: /etc/systemd/system/k3s.service # Idempotency

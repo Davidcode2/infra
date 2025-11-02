@@ -1,0 +1,8 @@
+---
+- name: Run tasks on the first master node
+  ansible.builtin.include_tasks: install-init.yml
+  when: inventory_hostname in groups['k3s_master_init']
+
+- name: Run tasks on the joining master nodes
+  ansible.builtin.include_tasks: install-join.yml
+  when: inventory_hostname in groups['k3s_masters_join']

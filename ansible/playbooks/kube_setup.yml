@@ -1,0 +1,35 @@
+---
+# Play 1: Wait for servers to be ready for SSH
+- name: Prepare all nodes
+  hosts: all
+  gather_facts: False
+  tasks:
+    - name: Wait for SSH to be available
+      ansible.builtin.wait_for_connection:
+        timeout: 60
+
+# Play 2: Install the k3s cluster
+- name: Install k3s HA cluster
+  hosts: k3s_masters
+  become: true
+  roles:
+    - k3s-ha
+
+# Play 3: Fetch kubeconfig for local use
+- name: Fetch kubeconfig
+  hosts: k3s_master_init
+  become: true
+  tasks:
+    - name: Fetch k3s.yaml from the first master
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "kubeconfig-{{ load_balancer_ip }}.yaml"
+        flat: yes
+
+    - name: Replace localhost with Load Balancer IP in local kubeconfig
+      ansible.builtin.local_action:
+        module: ansible.builtin.replace
+        path: "kubeconfig-{{ load_balancer_ip }}.yaml"
+        regexp: '127\.0\.0\.1'
+        replace: '{{ load_balancer_ip }}'
+      run_once: true
