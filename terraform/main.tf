@@ -79,3 +79,68 @@ resource "hcloud_ssh_key" "deployment_key" {
   name       = "deployment-key"
   public_key = tls_private_key.hetzner_private_key.public_key_openssh
 }
+
+
+# private network
+resource "hcloud_network" "k8s_private_net" {
+  name     = "k8s-private-net"
+  ip_range = "10.0.0.0/16"
+}
+
+resource "hcloud_network_subnet" "k8s_private_subnet" {
+  network_id   = hcloud_network.k8s_private_net.id
+  type         = "cloud"
+  network_zone = "eu-central"
+  ip_range     = "10.0.1.0/24"
+}
+
+resource "hcloud_server" "k8s_node" {
+  count       = 3 # Create three identical nodes
+  name        = "k8s-node-${count.index + 1}"
+  image       = "ubuntu-24.04"
+  server_type = "cx23" 
+  location    = "nbg1"
+  ssh_keys    = [hcloud_ssh_key.hetzner_ssh_key.id]
+
+  # Attach each server to the private network
+  network {
+    network_id = hcloud_network.k8s_private_net.id
+  }
+}
+
+# costs about 7 €/month
+resource "hcloud_load_balancer" "k8s_lb" {
+  name               = "k8s-load-balancer"
+  load_balancer_type = "lb11"
+  location           = "nbg1"
+}
+
+# Attach the Load Balancer to private network
+resource "hcloud_load_balancer_network" "lb_private_net" {
+  load_balancer_id = hcloud_load_balancer.k8s_lb.id
+  network_id       = hcloud_network.k8s_private_net.id
+}
+
+# Tell the Load Balancer to target servers
+resource "hcloud_load_balancer_target" "lb_target" {
+  count            = 3
+  type             = "server"
+  load_balancer_id = hcloud_load_balancer.k8s_lb.id
+  server_id        = hcloud_server.k8s_node[count.index].id
+  use_private_ip   = true
+}
+
+# Define the services (e.g., HTTP and HTTPS)
+resource "hcloud_load_balancer_service" "lb_http" {
+  load_balancer_id = hcloud_load_balancer.k8s_lb.id
+  protocol         = "tcp"
+  listen_port      = 80
+  destination_port = 30080 # Example port for Kubernetes NodePort
+}
+
+resource "hcloud_load_balancer_service" "lb_https" {
+  load_balancer_id = hcloud_load_balancer.k8s_lb.id
+  protocol         = "tcp"
+  listen_port      = 443
+  destination_port = 30443 # Example port for Kubernetes NodePort
+}
