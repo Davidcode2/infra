@@ -6,3 +6,6 @@ inventory/
 *.key
 *.vault
 .secrets/
+
+kubeconfig*.yaml
+kubeconfig*.yml
