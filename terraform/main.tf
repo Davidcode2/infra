@@ -46,16 +46,6 @@ module "projects" {
 }
 
 # compute
-resource "digitalocean_droplet" "jakobsOceanVM" {
-  name       = "jakobsOceanVM"
-  region     = "fra1"
-  size       = "s-1vcpu-2gb"
-  image      = "142476112"
-  monitoring = true
-
-  vpc_uuid = "94463b0e-551f-4943-b13d-ef8d1f5fcc27"
-}
-
 resource "hcloud_server" "hetzner_ubuntu-4gb-nbg1-1" {
   name        = "ubuntu-4gb-nbg1-1"
   image       = "ubuntu-24.04"
