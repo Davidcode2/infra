@@ -1,0 +1,37 @@
+---
+- name: Check if k3s is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Stop k3s service if running
+  ansible.builtin.service:
+    name: k3s
+    state: stopped
+    enabled: no
+  ignore_errors: true
+  when: k3s_binary.stat.exists
+
+- name: Run uninstall script if it exists
+  ansible.builtin.shell: /usr/local/bin/k3s-uninstall.sh
+  args:
+    removes: /usr/local/bin/k3s
+  ignore_errors: true
+  when: k3s_binary.stat.exists
+
+- name: Remove leftover k3s data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/rancher/k3s
+    - /var/lib/rancher/k3s
+    - /var/lib/kubelet
+    - /etc/systemd/system/k3s.service
+    - /etc/systemd/system/k3s.service.env
+  ignore_errors: true
+
+- name: Reload systemd after cleanup
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
