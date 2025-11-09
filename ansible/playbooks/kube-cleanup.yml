@@ -15,12 +15,21 @@
         state: stopped
       ignore_errors: true
 
+    - name: Unmount any K3s or kubelet mounts
+      ansible.builtin.shell: |
+        for m in $(mount | grep -E '/var/lib/rancher|/var/lib/kubelet|/run/k3s' | awk '{print $3}'); do
+          umount -l "$m" || true
+        done
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+
     - name: Remove K3s binaries
       ansible.builtin.file:
         path: /usr/local/bin/k3s
         state: absent
 
-    - name: Remove K3s data directories
+    - name: Remove K3s and Kubernetes data directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
@@ -40,7 +49,7 @@
       ansible.builtin.systemd:
         daemon_reload: yes
 
-    - name: Remove leftover iptables rules (optional but helps reset networking)
+    - name: Flush iptables (reset networking)
       ansible.builtin.shell: |
         iptables -F
         iptables -t nat -F
@@ -48,10 +57,10 @@
         iptables -X
       ignore_errors: true
 
-    - name: Ensure directories are gone
+    - name: Verify everything is gone
       ansible.builtin.shell: |
-        rm -rf /etc/rancher /var/lib/rancher /var/lib/kubelet /var/lib/cni /run/k3s /opt/cni
+        rm -rf /etc/rancher /var/lib/rancher /var/lib/kubelet /var/lib/cni /run/k3s /opt/cni || true
       args:
-        warn: false
+        executable: /bin/bash
       ignore_errors: true
 
