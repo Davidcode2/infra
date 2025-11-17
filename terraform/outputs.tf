@@ -8,6 +8,17 @@ output "server_private_ips" {
   value = hcloud_server.k8s_node.*.ipv4_address # Use .ipv4 (public) or .private_net[0].ip (private)
 }
 
+# Expose the Hetzner server IDs
+output "server_ids" {
+  value = [for s in hcloud_server.k8s_node : s.id]
+}
+
+# Map names to IDs for easier use in Ansible
+output "server_name_to_id" {
+  value = { for s in hcloud_server.k8s_node : s.name => s.id }
+}
+
+
 # This resource generates the inventory.ini file
 resource "local_file" "ansible_inventory" {
   # The content comes from the template file
@@ -18,6 +29,7 @@ resource "local_file" "ansible_inventory" {
       for s in hcloud_server.k8s_node : {
         name = s.name
         ipv4 = s.ipv4_address
+        id   = s.id
       }
     ]
     ssh_key_path = var.ssh_private_key_path # Add a variable for this

@@ -1,9 +1,15 @@
 ---
 - name: 1. Install k3s on the first server node
-  ansible.builtin.shell: >
-    curl -sfL https://get.k3s.io | sh -s - server
-    --cluster-init
-    --tls-san {{ load_balancer_ip }}
+  ansible.builtin.shell: |
+    curl -sfL https://get.k3s.io | \
+    INSTALL_K3S_EXEC="
+      server
+      --cluster-init
+      --tls-san {{ load_balancer_ip }}
+      --disable traefik 
+      --disable-cloud-controller
+      --kubelet-arg cloud-provider=external
+    " sh 
   args:
     creates: /etc/systemd/system/k3s.service # This makes the command idempotent
 

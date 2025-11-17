@@ -16,7 +16,7 @@ ${masters[0].name} ansible_host=${masters[0].ipv4}
 # This group contains the other two nodes that will join
 [k3s_masters_join]
 %{ for node in slice(masters, 1, length(masters)) ~}
-${node.name} ansible_host=${node.ipv4}
+${node.name} ansible_host=${node.ipv4} hcloud_id=${m.id}
 %{ endfor ~}
 
 # This group contains ALL master nodes
