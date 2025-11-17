@@ -1,0 +1,46 @@
+---
+- name: ArgoCD Bootstrap Playbook
+  hosts: localhost # Run this play on your local machine
+  connection: local
+  become: false # Do not use sudo on your local machine
+
+  vars:
+    # Use the KUBECONFIG environment variable set in your shell
+    kubeconfig_path: "{{ lookup('env', 'KUBECONFIG') }}"
+
+  tasks:
+    - name: Ensure KUBECONFIG is set
+      ansible.builtin.fail:
+        msg: "Error: KUBECONFIG environment variable is not set. Please set it to your cluster config file."
+      when: kubeconfig_path == ""
+
+    - name: 1. Create the ArgoCD Namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: argocd
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+
+    - name: 2. Install ArgoCD using the Official Manifest
+      kubernetes.core.k8s:
+        state: present
+        # Use the official v2.x manifest from ArgoCD
+        src: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+        namespace: argocd
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+
+    - name: 3. Wait for ArgoCD deployment to be ready
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: argocd-server
+        namespace: argocd
+        wait: true
+        wait_timeout: 300 # Wait up to 5 minutes
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
