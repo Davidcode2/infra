@@ -5,9 +5,10 @@
     INSTALL_K3S_EXEC="
       server
       --tls-san {{ load_balancer_ip }}
-      --kubelet-arg cloud-provider=external
       --server https://{{ k3s_init_node_ip }}:6443
       --token {{ hostvars[groups['k3s_master_init'][0]]['k3s_token'] }}
+      --kubelet-arg cloud-provider=external
+      --kubelet-arg provider-id=hcloud://{{ hcloud_id }}
     " sh 
   args:
     creates: /etc/systemd/system/k3s.service # Idempotency

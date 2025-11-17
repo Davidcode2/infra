@@ -6,7 +6,9 @@
       server
       --cluster-init
       --tls-san {{ load_balancer_ip }}
+      --disable traefik 
       --kubelet-arg cloud-provider=external
+      --kubelet-arg provider-id=hcloud://{{ hcloud_id }}
     " sh 
   args:
     creates: /etc/systemd/system/k3s.service # This makes the command idempotent
