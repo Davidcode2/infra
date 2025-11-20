@@ -7,6 +7,7 @@
       --tls-san {{ load_balancer_ip }}
       --server https://{{ k3s_init_node_ip }}:6443
       --token {{ hostvars[groups['k3s_master_init'][0]]['k3s_token'] }}
+      --disable traefik 
       --kubelet-arg cloud-provider=external
       --kubelet-arg provider-id=hcloud://{{ hcloud_id }}
     " sh 
