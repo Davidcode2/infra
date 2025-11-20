@@ -4,8 +4,6 @@
     curl -sfL https://get.k3s.io | \
     INSTALL_K3S_EXEC="
       server
-      --cluster-init
-      --tls-san {{ load_balancer_ip }}
       --disable traefik 
       --kubelet-arg cloud-provider=external
       --kubelet-arg provider-id=hcloud://{{ hcloud_id }}
