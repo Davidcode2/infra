@@ -59,6 +59,15 @@ resource "digitalocean_record" "jakob_lingel_dev_analytics" {
   ttl    = 1800
 }
 
+# argocd CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_argocd" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "argocd"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name
