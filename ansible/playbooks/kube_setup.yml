@@ -23,14 +23,14 @@
     - name: Fetch k3s.yaml from the first master
       ansible.builtin.fetch:
         src: /etc/rancher/k3s/k3s.yaml
-        dest: "kubeconfig-{{ load_balancer_ip }}.yaml"
+        dest: "kubeconfig-{{ k3s_init_node_ip }}.yaml"
         flat: yes
 
-    - name: Replace localhost with Load Balancer IP in local kubeconfig
+    - name: Replace localhost with First Node IP in local kubeconfig
       local_action:
         module: ansible.builtin.replace
-        path: "kubeconfig-{{ load_balancer_ip }}.yaml"
+        path: "kubeconfig-{{ k3s_init_node_ip }}.yaml"
         regexp: '127\.0\.0\.1'
-        replace: '{{ load_balancer_ip }}'
+        replace: '{{ k3s_init_node_ip }}'
       run_once: true
       become: false
