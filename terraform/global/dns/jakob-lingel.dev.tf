@@ -82,7 +82,7 @@ resource "digitalocean_record" "jakob_lingel_dev_argocd" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "argocd"
-  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  value  = "49.13.45.106"
   ttl    = 1800
 }
 
