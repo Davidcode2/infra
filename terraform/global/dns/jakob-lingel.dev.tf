@@ -32,6 +32,15 @@ resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
   ttl    = 30
 }
 
+# www.blog CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.blog"
+  value  = "blog.jakob-lingel.dev."
+  ttl    = 30
+}
+
 # google search ownership verification TXT record for immoly
 resource "digitalocean_record" "jakob_lingel_dev_immoly_google_verification" {
   domain = digitalocean_domain.jakob-lingel-dev.name
@@ -59,12 +68,30 @@ resource "digitalocean_record" "jakob_lingel_dev_analytics" {
   ttl    = 1800
 }
 
+# www.analytics CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_analytics" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.analytics"
+  value  = "analytics.jakob-lingel.dev."
+  ttl    = 1800
+}
+
 # argocd CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_argocd" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "argocd"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# www.argocd CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_argocd" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.argocd"
+  value  = "argocd.jakob-lingel.dev."
   ttl    = 1800
 }
 
