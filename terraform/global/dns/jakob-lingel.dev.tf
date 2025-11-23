@@ -33,7 +33,7 @@ resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
 }
 
 # www.blog CNAME record
-resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
+resource "digitalocean_record" "jakob_lingel_dev_www_blog_CNAME" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "www.blog"
@@ -69,7 +69,7 @@ resource "digitalocean_record" "jakob_lingel_dev_analytics" {
 }
 
 # www.analytics CNAME record
-resource "digitalocean_record" "jakob_lingel_dev_analytics" {
+resource "digitalocean_record" "jakob_lingel_dev_www_analytics" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "www.analytics"
@@ -87,7 +87,7 @@ resource "digitalocean_record" "jakob_lingel_dev_argocd" {
 }
 
 # www.argocd CNAME record
-resource "digitalocean_record" "jakob_lingel_dev_argocd" {
+resource "digitalocean_record" "jakob_lingel_dev_www_argocd" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "www.argocd"
