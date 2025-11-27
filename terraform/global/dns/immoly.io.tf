@@ -37,10 +37,28 @@ resource "digitalocean_record" "immoly_io_alemazung_CNAME" {
 }
 
 # www.alemazung CNAME record
-resource "digitalocean_record" "immoly_io_alemazung_CNAME" {
+resource "digitalocean_record" "immoly_io_www_alemazung_CNAME" {
   domain = digitalocean_domain.immoly-io.name
   type   = "CNAME"
   name   = "www.alemazung"
+  value  = "${digitalocean_domain.immoly-io.name}."
+  ttl    = 30
+}
+
+# api.alemazung CNAME record
+resource "digitalocean_record" "immoly_io_api_alemazung_CNAME" {
+  domain = digitalocean_domain.immoly-io.name
+  type   = "CNAME"
+  name   = "api.alemazung"
+  value  = "${digitalocean_domain.immoly-io.name}."
+  ttl    = 30
+}
+
+# www.api.alemazung CNAME record
+resource "digitalocean_record" "immoly_io_www_api_alemazung_CNAME" {
+  domain = digitalocean_domain.immoly-io.name
+  type   = "CNAME"
+  name   = "www.api.alemazung"
   value  = "${digitalocean_domain.immoly-io.name}."
   ttl    = 30
 }
