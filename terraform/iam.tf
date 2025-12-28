@@ -56,3 +56,42 @@ resource "aws_iam_openid_connect_provider" "github" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = []
 }
+
+resource "aws_iam_user" "external_secrets" {
+  name = "external-secrets-ssm"
+}
+
+resource "aws_iam_user_policy" "external_secrets_ssm" {
+  name = "external-secrets-ssm-read"
+  user = aws_iam_user.external_secrets.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ]
+        Resource = [
+          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/immoly/*",
+          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/joy-alemazung/*",
+          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/schluesselmomente/*"
+        ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = "ssm:DescribeParameters"
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = "kms:Decrypt"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
