@@ -70,3 +70,13 @@ resource "aws_ssm_parameter" "immoly_db_name" {
     ignore_changes = [value]
   }
 }
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_api_url" {
+  name        = "/joy_alemazung/strapi/api_url"
+  description = "Strapi API URL for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
