@@ -79,7 +79,7 @@ resource "aws_iam_user_policy" "external_secrets_ssm" {
         ]
         Resource = [
           "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/immoly/*",
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/joy-alemazung/*",
+          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/joy_alemazung/*",
           "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/schluesselmomente/*"
         ]
       },
