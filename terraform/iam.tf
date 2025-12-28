@@ -61,6 +61,8 @@ resource "aws_iam_user" "external_secrets" {
   name = "external-secrets-ssm"
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_user_policy" "external_secrets_ssm" {
   name = "external-secrets-ssm-read"
   user = aws_iam_user.external_secrets.name
