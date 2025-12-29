@@ -1,5 +1,5 @@
 locals {
-  server_name   = "hetzner-cloud-server-1"
+  server_name = "hetzner-cloud-server-1"
 }
 
 resource "aws_ssm_parameter" "hetzner_cloud_server_1_ipv4" {
@@ -80,3 +80,91 @@ resource "aws_ssm_parameter" "joy_alemazung_strapi_api_url" {
     ignore_changes = [value]
   }
 }
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_api_token" {
+  name        = "/joy_alemazung/strapi/api_token"
+  description = "Strapi API token for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_admin_jwt_secret" {
+  name        = "/joy_alemazung/strapi/admin_jwt_secret"
+  description = "Strapi admin JWT secret for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_api_token_salt" {
+  name        = "/joy_alemazung/strapi/api_token_salt"
+  description = "Strapi API token salt for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_app_keys" {
+  name        = "/joy_alemazung/strapi/app_keys"
+  description = "Strapi app keys for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_db_password" {
+  name        = "/joy_alemazung/strapi/db/password"
+  description = "Strapi database password for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_db_encryption_key" {
+  name        = "/joy_alemazung/strapi/db/encryption_key"
+  description = "Strapi database encryption key for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_jwt_secret" {
+  name        = "/joy_alemazung/strapi/jwt_secret"
+  description = "Strapi JWT secret for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "joy_alemazung_strapi_transfer_token_salt" {
+  name        = "/joy_alemazung/strapi/transfer_token_salt"
+  description = "Strapi transfer token salt for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
