@@ -79,6 +79,24 @@ resource "digitalocean_record" "jakob_lingel_dev_www_analytics" {
   ttl    = 1800
 }
 
+# uptime CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_uptime" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "uptime"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# www.uptime CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_www_uptime" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.uptime"
+  value  = "uptime.jakob-lingel.dev."
+  ttl    = 1800
+}
+
 # argocd CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_argocd" {
   domain = digitalocean_domain.jakob-lingel-dev.name
