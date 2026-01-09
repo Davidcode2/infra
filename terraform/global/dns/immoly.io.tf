@@ -24,7 +24,7 @@ resource "digitalocean_record" "immoly_io_blog_CNAME" {
   type   = "CNAME"
   name   = "blog"
   value  = "${digitalocean_domain.immoly-io.name}."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # alemazung CNAME record
@@ -33,7 +33,7 @@ resource "digitalocean_record" "immoly_io_alemazung_CNAME" {
   type   = "CNAME"
   name   = "alemazung"
   value  = "${digitalocean_domain.immoly-io.name}."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # www.alemazung CNAME record
@@ -42,7 +42,7 @@ resource "digitalocean_record" "immoly_io_www_alemazung_CNAME" {
   type   = "CNAME"
   name   = "www.alemazung"
   value  = "${digitalocean_domain.immoly-io.name}."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # api.alemazung CNAME record
@@ -51,7 +51,7 @@ resource "digitalocean_record" "immoly_io_api_alemazung_CNAME" {
   type   = "CNAME"
   name   = "api.alemazung"
   value  = "${digitalocean_domain.immoly-io.name}."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # www.api.alemazung CNAME record
@@ -60,7 +60,7 @@ resource "digitalocean_record" "immoly_io_www_api_alemazung_CNAME" {
   type   = "CNAME"
   name   = "www.api.alemazung"
   value  = "${digitalocean_domain.immoly-io.name}."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # google search ownership verification TXT record for immoly
