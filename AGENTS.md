@@ -158,12 +158,19 @@ Located in `reverse_proxy/`. Runs on `ubuntu-4gb-nbg1-1`.
 - Manual cert renewal via cron
 
 ### Managed Services
-- Schlüsselmomente (frontend + CMS + backend)
+- Schlüsselmomente (frontend + backend only; CMS migrated to k8s)
 - Mimi's Kreativstudio (Ghost CMS)
 - Other legacy apps
 
-### Migration Plan
-These services are being migrated to the k8s cluster. Once complete, this reverse proxy will be decommissioned.
+### Migration Status
+**Migrated to k8s:**
+- ✅ Schlüsselmomente CMS (admin.schluesselmomente-freiburg.de) - Now managed via ArgoCD
+
+**Remaining in Docker:**
+- Schlüsselmomente frontend/backend
+- Mimi's Kreativstudio Ghost CMS
+
+The reverse proxy will be decommissioned once all remaining services are migrated.
 
 ## 🚀 Complete Setup Flow
 
@@ -217,7 +224,8 @@ From zero to production:
 
 ### Legacy Components (To Migrate)
 - 🔄 Docker reverse proxy on ubuntu-4gb-nbg1-1
-- 🔄 Schlüsselmomente containers
+- ✅ Schlüsselmomente CMS (COMPLETED - migrated to k8s)
+- 🔄 Schlüsselmomente frontend/backend
 - 🔄 Mimi's Kreativstudio Ghost
 
 ### Planned Improvements

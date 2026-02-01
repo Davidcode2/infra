@@ -32,7 +32,6 @@ services:
       --agree-tos 
       --no-eff-email
       --cert-name legit-certificate
-      -d admin.schluesselmomente-freiburg.de
       -d schluesselmomente-freiburg.de
       -d jakob-lingel.dev
       -d immoly.jakob-lingel.dev
