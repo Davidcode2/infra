@@ -9,48 +9,37 @@ This guide walks through setting up automated Terraform workflows with GitHub Ac
 - Hetzner Cloud API token
 - DigitalOcean API token
 
-## 1. Create S3 Backend Resources
+## 1. Create S3 Backend Resources (Infrastructure as Code)
 
-### 1.1 Create S3 Bucket for State Storage
+The S3 backend resources are managed by a separate Terraform configuration in `terraform/bootstrap/`.
 
-```bash
-aws s3 mb s3://jakob-terraform-state --region eu-central-1
-
-# Enable versioning (for state recovery)
-aws s3api put-bucket-versioning \
-  --bucket jakob-terraform-state \
-  --versioning-configuration Status=Enabled
-
-# Enable encryption
-aws s3api put-bucket-encryption \
-  --bucket jakob-terraform-state \
-  --server-side-encryption-configuration '{
-    "Rules": [{
-      "ApplyServerSideEncryptionByDefault": {
-        "SSEAlgorithm": "AES256"
-      }
-    }]
-  }'
-
-# Block public access
-aws s3api put-public-access-block \
-  --bucket jakob-terraform-state \
-  --public-access-block-configuration \
-    BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
-```
-
-### 1.2 Create DynamoDB Table for State Locking
+### 1.1 Apply Bootstrap Configuration
 
 ```bash
-aws dynamodb create-table \
-  --table-name terraform-state-lock \
-  --attribute-definitions AttributeName=LockID,AttributeType=S \
-  --key-schema AttributeName=LockID,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST \
-  --region eu-central-1
+cd terraform/bootstrap
+
+# Initialize (uses local backend)
+terraform init
+
+# Review what will be created
+terraform plan
+
+# Create S3 bucket and DynamoDB table
+terraform apply
 ```
 
-### 1.3 Verify Resources
+This creates:
+- **S3 bucket** `jakob-terraform-state`
+  - Versioning enabled
+  - Encryption enabled (AES256)
+  - Public access blocked
+  - Lifecycle policy for old versions
+- **DynamoDB table** `terraform-state-lock`
+  - Pay-per-request billing
+  - Point-in-time recovery
+  - Encryption at rest
+
+### 1.2 Verify Resources
 
 ```bash
 # Check bucket exists
@@ -59,6 +48,8 @@ aws s3 ls s3://jakob-terraform-state
 # Check DynamoDB table
 aws dynamodb describe-table --table-name terraform-state-lock --region eu-central-1
 ```
+
+**See `terraform/bootstrap/README.md` for detailed documentation.**
 
 ## 2. Migrate Local State to S3
 

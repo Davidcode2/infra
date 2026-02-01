@@ -64,6 +64,17 @@ Three cloud providers:
 - `global/dns` - All DNS records
 - `projects` - Project-specific infrastructure
 
+### Main Terraform Files
+- `main.tf` - Core infrastructure (servers, networks, backend config)
+- `firewall.tf` - Hetzner Cloud Firewalls for all servers
+- `iam.tf` - IAM roles and policies
+- `outputs.tf` - Terraform outputs
+- `variables.tf` - Input variables
+- `bootstrap/` - Bootstrap configuration for S3 backend
+  - Creates S3 bucket and DynamoDB table
+  - Uses local state
+  - See `bootstrap/README.md`
+
 ### State Management
 
 **Remote State (S3):**
@@ -72,6 +83,13 @@ Three cloud providers:
 - Locking: DynamoDB table `terraform-state-lock`
 - Encryption: Enabled (AES256)
 - Versioning: Enabled (for rollback)
+
+**Bootstrap Infrastructure:**
+The S3 backend itself is managed by Terraform in `terraform/bootstrap/`:
+- Uses local state (`terraform/bootstrap/terraform.tfstate`)
+- Creates S3 bucket and DynamoDB table
+- Separate from main infrastructure
+- See `terraform/bootstrap/README.md` for details
 
 **Do not commit local state files** - they're in `.gitignore`.
 

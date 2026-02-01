@@ -5,6 +5,9 @@
 *.tfstate
 *.tfstate.*
 
+# Keep bootstrap state for reference (but should be backed up separately)
+# This state manages the S3 backend itself
+
 # Crash log files
 crash.log
 
