@@ -13,6 +13,16 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  # S3 backend for remote state storage
+  # Uncomment after creating the S3 bucket and DynamoDB table
+  # backend "s3" {
+  #   bucket         = "jakob-terraform-state"
+  #   key            = "infra/terraform.tfstate"
+  #   region         = "eu-central-1"
+  #   dynamodb_table = "terraform-state-lock"
+  #   encrypt        = true
+  # }
 }
 
 provider "digitalocean" {
@@ -24,8 +34,9 @@ provider "hcloud" {
 }
 
 provider "aws" {
-  region  = "eu-central-1"
-  profile = "admin"
+  region = "eu-central-1"
+  # Uses AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables
+  # or the default AWS credentials file for local development
 }
 
 module "dns" {

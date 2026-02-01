@@ -64,12 +64,52 @@ Three cloud providers:
 - `global/dns` - All DNS records
 - `projects` - Project-specific infrastructure
 
+### Main Terraform Files
+- `main.tf` - Core infrastructure (servers, networks, backend config)
+- `firewall.tf` - Hetzner Cloud Firewalls for all servers
+- `iam.tf` - IAM roles and policies
+- `outputs.tf` - Terraform outputs
+- `variables.tf` - Input variables
+- `bootstrap/` - Bootstrap configuration for S3 backend
+  - Creates S3 bucket and DynamoDB table
+  - Uses local state
+  - See `bootstrap/README.md`
+
 ### State Management
-Terraform state is managed locally. **Do not commit state files.**
 
-### Common Workflows
+**Remote State (S3):**
+- Stored in: `s3://jakob-terraform-state/infra/terraform.tfstate`
+- Region: eu-central-1
+- Locking: DynamoDB table `terraform-state-lock`
+- Encryption: Enabled (AES256)
+- Versioning: Enabled (for rollback)
 
-**Provision new infrastructure:**
+**Bootstrap Infrastructure:**
+The S3 backend itself is managed by Terraform in `terraform/bootstrap/`:
+- Uses local state (`terraform/bootstrap/terraform.tfstate`)
+- Creates S3 bucket and DynamoDB table
+- Separate from main infrastructure
+- See `terraform/bootstrap/README.md` for details
+
+**Do not commit local state files** - they're in `.gitignore`.
+
+### CI/CD Workflow
+
+**Automated via GitHub Actions:**
+
+**On Pull Request:**
+1. Run `terraform fmt -check`
+2. Run `terraform init`
+3. Run `terraform validate`
+4. Run `terraform plan`
+5. Post plan as PR comment
+
+**On Merge to Main:**
+1. Run `terraform init`
+2. Run `terraform apply -auto-approve`
+3. Infrastructure changes applied automatically
+
+**Manual Operations (for urgent changes):**
 ```bash
 cd terraform
 terraform init
@@ -77,13 +117,38 @@ terraform plan
 terraform apply
 ```
 
+### Common Workflows
+
+**Make Infrastructure Changes (PR-based):**
+```bash
+# 1. Create branch
+git checkout -b feat/add-new-resource
+
+# 2. Edit Terraform files
+cd terraform
+vim main.tf  # or firewall.tf, etc.
+
+# 3. Commit and push
+git add .
+git commit -m "feat: Add new resource"
+git push -u origin feat/add-new-resource
+
+# 4. Create PR
+gh pr create --title "feat: Add new resource"
+
+# 5. Review terraform plan in PR comments
+# 6. Merge PR → terraform apply runs automatically
+```
+
 **Update DNS records:**
 ```bash
 cd terraform/global/dns
 # Edit dns.tf
-terraform plan
-terraform apply
+# Follow PR workflow above
 ```
+
+**Setup CI/CD (One-Time):**
+See `terraform/CICD_SETUP.md` for complete guide
 
 ## 🤖 Ansible Patterns
 
