@@ -69,3 +69,11 @@ variable "ssh_private_key_path" {
   description = "Path to the SSH private key"
   sensitive   = true
 }
+
+variable "k8s_load_balancer_ipv4" {
+  type        = string
+  description = "IP address of the Kubernetes cluster load balancer (assigned by Hetzner CCM)"
+  sensitive   = false
+  default     = ""
+}
+

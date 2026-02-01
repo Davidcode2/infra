@@ -150,6 +150,45 @@ cd terraform/global/dns
 **Setup CI/CD (One-Time):**
 See `terraform/CICD_SETUP.md` for complete guide
 
+**Migrate Service from Docker to Kubernetes (with DNS update):**
+```bash
+# 1. Deploy application to k8s (via app-of-apps repo)
+# 2. Wait for k8s ingress-nginx LoadBalancer to get IP
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+
+# Example output:
+# NAME                       TYPE           EXTERNAL-IP
+# ingress-nginx-controller   LoadBalancer   49.13.123.45
+
+# 3. Update terraform variable with the LoadBalancer IP
+cd terraform
+# Add to terraform.tfvars:
+# k8s_load_balancer_ipv4 = "49.13.123.45"
+
+# 4. Update DNS records to point to k8s
+cd terraform/global/dns
+# Edit relevant domain file (e.g., schluesselmomente-freiburg.de.tf)
+# Change: value = var.hetzner_cloud_server_1_ipv4
+# To:     value = var.k8s_load_balancer_ipv4
+
+# 5. Apply via PR workflow
+git checkout -b feat/dns-migrate-to-k8s
+git add .
+git commit -m "feat: Migrate DNS to k8s load balancer"
+git push
+gh pr create
+
+# 6. Merge PR → DNS updates automatically
+# 7. Wait for DNS propagation (usually 5-30 minutes)
+# 8. Verify new DNS resolves to k8s LB IP:
+dig admin.schluesselmomente-freiburg.de +short
+
+# 9. Test service is accessible via k8s
+curl -I https://admin.schluesselmomente-freiburg.de
+
+# 10. Once verified, remove old Docker containers (via infra cleanup PR)
+```
+
 ## 🤖 Ansible Patterns
 
 ### Inventory
