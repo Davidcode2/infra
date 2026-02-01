@@ -3,7 +3,7 @@ resource "digitalocean_record" "mimis_kreativstudio_de_www_A" {
   type = "A"
   name = "www"
   value = var.hetzner_cloud_server_1_ipv4
-  ttl    = 30
+  ttl    = 1800
 }
 
 resource "digitalocean_record" "mimis_kreativstudio_de_A" {
@@ -11,7 +11,7 @@ resource "digitalocean_record" "mimis_kreativstudio_de_A" {
   type   = "A"
   name   = "@"
   value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 30
+  ttl    = 1800
 }
 
 # NS records
