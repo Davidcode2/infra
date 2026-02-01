@@ -1,3 +1,7 @@
+
+#################
+#    hetzner    #
+#################
 locals {
   server_name = "hetzner-cloud-server-1"
 }
@@ -41,6 +45,9 @@ resource "aws_ssm_parameter" "hetzner_cloud_server_1_openssl_private_ssh_key" {
   }
 }
 
+#################
+# immoly        #
+#################
 resource "aws_ssm_parameter" "immoly_db_user" {
   name        = "/immoly/db/user"
   description = "Database user for immoly"
@@ -71,6 +78,9 @@ resource "aws_ssm_parameter" "immoly_db_name" {
   }
 }
 
+#################
+# joy_alemazung #
+#################
 resource "aws_ssm_parameter" "joy_alemazung_strapi_api_url" {
   name        = "/joy_alemazung/strapi/api_url"
   description = "Strapi API URL for joy_alemazung"
@@ -168,3 +178,27 @@ resource "aws_ssm_parameter" "joy_alemazung_strapi_transfer_token_salt" {
   }
 }
 
+#################
+# umami         #
+#################
+resource "aws_ssm_parameter" "umami_db_password" {
+  name        = "/umami/db/password"
+  description = "Database password for umami"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "umami_app_secret" {
+  name        = "/umami/app_secret"
+  description = "Application secret for umami"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}

@@ -31,7 +31,7 @@ resource "digitalocean_record" "jakob_lingel_dev_blog_CNAME" {
   type   = "CNAME"
   name   = "blog"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # www.blog CNAME record
@@ -40,7 +40,7 @@ resource "digitalocean_record" "jakob_lingel_dev_www_blog_CNAME" {
   type   = "CNAME"
   name   = "www.blog"
   value  = "blog.jakob-lingel.dev."
-  ttl    = 30
+  ttl    = 1800
 }
 
 # google search ownership verification TXT record for immoly
