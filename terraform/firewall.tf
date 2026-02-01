@@ -188,10 +188,10 @@ resource "hcloud_firewall" "legacy_vm" {
 }
 
 # Attach firewall to k8s cluster nodes
-resource "hcloud_firewall_attachment" "k8s_cluster" {
-  firewall_id = hcloud_firewall.k8s_cluster.id
-  server_ids  = [for server in hcloud_server.k8s_node : server.id]
-}
+#resource "hcloud_firewall_attachment" "k8s_cluster" {
+#  firewall_id = hcloud_firewall.k8s_cluster.id
+#  server_ids  = [for server in hcloud_server.k8s_node : server.id]
+#}
 
 # Attach firewall to legacy VM
 resource "hcloud_firewall_attachment" "legacy_vm" {

@@ -54,7 +54,8 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_admin_a" {
   domain = digitalocean_domain.schluesselmomente_freiburg_de.name
   type   = "A"
   name   = "admin"
-  value  = var.hetzner_cloud_server_1_ipv4
+  #value  = var.hetzner_cloud_server_1_ipv4
+  value  = "49.13.45.106"
   ttl    = 3600
 }
 
@@ -62,7 +63,8 @@ resource "digitalocean_record" "schluesselmomente_freiburg_de_www_admin_a" {
   domain = digitalocean_domain.schluesselmomente_freiburg_de.name
   type   = "A"
   name   = "www.admin"
-  value  = var.hetzner_cloud_server_1_ipv4
+  #value  = var.hetzner_cloud_server_1_ipv4
+  value  = "49.13.45.106"
   ttl    = 3600
 }
 
