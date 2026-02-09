@@ -115,6 +115,33 @@ resource "digitalocean_record" "jakob_lingel_dev_www_argocd" {
   ttl    = 1800
 }
 
+# home-at-sea CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_homeatsea_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "homeatsea"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# www.homeatsea CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_www_homeatsea_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.homeatsea"
+  value  = "homeatsea.jakob-lingel.dev."
+  ttl    = 1800
+}
+
+# api.homeatsea CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_api_homeatsea_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "api.homeatsea"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name
