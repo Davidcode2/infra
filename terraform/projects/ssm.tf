@@ -211,6 +211,16 @@ resource "aws_ssm_parameter" "schluesselmomente_be_mail" {
   }
 }
 
+resource "aws_ssm_parameter" "schluesselmomente_be_password" {
+  name        = "/schluesselmomente/be/password"
+  description = "Password for email"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 #################
 # umami         #
 #################
