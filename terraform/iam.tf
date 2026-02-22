@@ -45,7 +45,8 @@ resource "aws_iam_role_policy" "ci-policy" {
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*",
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly*",
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/joy_alemazung*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/home_at_sea*"
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/home_at_sea*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/teachme*"
         ]
       }
     ]
@@ -83,7 +84,8 @@ resource "aws_iam_user_policy" "external_secrets_ssm" {
           "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/joy_alemazung/*",
           "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/schluesselmomente/*",
           "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/umami/*",
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/home_at_sea/*"
+          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/home_at_sea/*",
+          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/teachme*"
         ]
       },
       {
