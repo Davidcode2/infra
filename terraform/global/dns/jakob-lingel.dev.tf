@@ -115,6 +115,24 @@ resource "digitalocean_record" "jakob_lingel_dev_www_argocd" {
   ttl    = 1800
 }
 
+# telemetry CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_telemetry" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "telemetry"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# www.telemetry CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_www_telemetry" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.telemetry"
+  value  = "telemetry.jakob-lingel.dev."
+  ttl    = 1800
+}
+
 # NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name
