@@ -156,7 +156,6 @@ resource "digitalocean_record" "jakob_lingel_dev_api_homeatsea_CNAME" {
   type   = "CNAME"
   name   = "api.homeatsea"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
->>>>>>> e68c42f438128e953c29bb5d0dc70f6eb22d1f14
   ttl    = 1800
 }
 
