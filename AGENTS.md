@@ -52,6 +52,19 @@ Managed via Terraform in `global/dns/`:
 - `immoly.io`
 - `mimis-kreativstudio.de`
 
+### Security
+
+**Hetzner Cloud Firewalls:**
+- **k8s-cluster-firewall** - Applied to all 3 k8s nodes
+  - Allows: SSH (22), HTTP (80), HTTPS (443), K8s API (6443), ICMP
+  - Allows: All traffic within private network (10.0.0.0/16)
+  - Default: Deny all other inbound traffic
+- **legacy-vm-firewall** - Applied to ubuntu-4gb-nbg1-1
+  - Allows: SSH (22), HTTP (80), HTTPS (443), ICMP
+  - Default: Deny all other inbound traffic
+
+All outbound traffic is allowed by default (servers need to reach external services).
+
 ## 🔧 Terraform Patterns
 
 ### Provider Setup
@@ -63,6 +76,13 @@ Three cloud providers:
 ### Modules
 - `global/dns` - All DNS records
 - `projects` - Project-specific infrastructure
+
+### Main Terraform Files
+- `main.tf` - Core infrastructure (servers, networks)
+- `firewall.tf` - Hetzner Cloud Firewalls for all servers
+- `iam.tf` - IAM roles and policies
+- `outputs.tf` - Terraform outputs
+- `variables.tf` - Input variables
 
 ### State Management
 Terraform state is managed locally. **Do not commit state files.**
@@ -81,6 +101,14 @@ terraform apply
 ```bash
 cd terraform/global/dns
 # Edit dns.tf
+terraform plan
+terraform apply
+```
+
+**Update firewall rules:**
+```bash
+cd terraform
+# Edit firewall.tf
 terraform plan
 terraform apply
 ```

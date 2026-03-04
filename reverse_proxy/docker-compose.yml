@@ -52,6 +52,7 @@ services:
       - source: nginx_conf
         target: /etc/nginx/nginx.conf
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - certbot-etc:/etc/letsencrypt:ro

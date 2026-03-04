@@ -178,6 +178,49 @@ resource "aws_ssm_parameter" "joy_alemazung_strapi_transfer_token_salt" {
   }
 }
 
+######################
+# schluesselmomente  #
+######################
+resource "aws_ssm_parameter" "schluesselmomente_be_mailgun_api_key" {
+  name        = "/schluesselmomente/be/mailgun_api_key"
+  description = "Mailgun API key for schluesselmomente backend"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schluesselmomente_be_schluesselmomente_sendkey" {
+  name        = "/schluesselmomente/be/schluesselmomente_sendkey"
+  description = "Sendkey for schluesselmomente backend"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schluesselmomente_be_mail" {
+  name        = "/schluesselmomente/be/mail"
+  description = "Recipient email for schluesselmomente backend"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schluesselmomente_be_password" {
+  name        = "/schluesselmomente/be/password"
+  description = "Password for email"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 #################
 # umami         #
 #################
