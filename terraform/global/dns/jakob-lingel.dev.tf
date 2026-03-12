@@ -1,3 +1,4 @@
+# Points to business-website ingress
 resource "digitalocean_record" "jakob_lingel_dev_www_A" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type = "A"
@@ -7,10 +8,21 @@ resource "digitalocean_record" "jakob_lingel_dev_www_A" {
   ttl    = 1800
 }
 
+# Points to business-website ingress
 resource "digitalocean_record" "jakob_lingel_dev_A" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "A"
   name   = "@"
+  value  = "49.13.45.106"
+  #value  = var.hetzner_cloud_server_1_ipv4
+  ttl    = 1800
+}
+
+# Points to the existing portfolio site (jakob-lingel app)
+resource "digitalocean_record" "jakob_lingel_dev_portfolio_A" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "A"
+  name   = "portfolio"
   value  = "49.13.45.106"
   #value  = var.hetzner_cloud_server_1_ipv4
   ttl    = 1800
