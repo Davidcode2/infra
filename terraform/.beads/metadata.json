@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "terraform",
+  "project_id": "fd1c2702-8bcb-46dd-acbf-c33fe2539083"
+}
