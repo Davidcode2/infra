@@ -90,66 +90,76 @@ terraform plan
 # Expected: Error acquiring the state lock
 ```
 
-## 3. Configure GitHub Secrets
+## 3. Configure GitHub Secrets and AWS Parameter Store
+
+The workflow uses **OIDC authentication** with AWS (no static credentials needed) and fetches all provider secrets from **AWS Parameter Store**.
+
+### 3.1 Configure GitHub Secret
 
 Go to your GitHub repository → Settings → Secrets and variables → Actions → New repository secret
 
-### 3.1 AWS Credentials
-
-**AWS_ACCESS_KEY_ID**
-- Create IAM user for GitHub Actions with programmatic access
-- Attach policies: `AmazonS3FullAccess`, `AmazonDynamoDBFullAccess`
-- Copy Access Key ID
-
-**AWS_SECRET_ACCESS_KEY**
-- Copy Secret Access Key from the same IAM user
-
-**AWS_ACCOUNT_ID**
+**AWS_ACCOUNT_ID** (required)
 - Your AWS account ID (12-digit number)
 - Find it: AWS Console → Account dropdown → Account ID
+- This is the ONLY secret needed in GitHub!
 
-### 3.2 Hetzner Cloud
+### 3.2 Set Parameter Store Values
 
-**HCLOUD_TOKEN**
-- Go to: Hetzner Cloud Console → Project → Security → API Tokens
-- Create new token with Read & Write permissions
-- Copy the token (shown only once)
+All other secrets are stored in AWS Parameter Store under `/infra/terraform/*`. After applying the Terraform configuration, set the actual values:
 
-**HCLOUD_SSH_KEY**
-- Your SSH public key content (the one added to Hetzner)
-- Format: `ssh-rsa AAAAB3NzaC1yc2E...`
+```bash
+# Set Hetzner Cloud API token
+aws ssm put-parameter \
+  --name "/infra/terraform/providers/hcloud_token" \
+  --type SecureString \
+  --value "your-hetzner-token-here" \
+  --overwrite
 
-**HETZNER_CLOUD_SERVER_1_IPV4**
-- IP address of your ubuntu-4gb-nbg1-1 server
-- Find it: Hetzner Cloud Console → Servers → ubuntu-4gb-nbg1-1
+# Set DigitalOcean API token
+aws ssm put-parameter \
+  --name "/infra/terraform/providers/digitalocean_token" \
+  --type SecureString \
+  --value "your-do-token-here" \
+  --overwrite
 
-### 3.3 DigitalOcean
+# Set server IPs
+aws ssm put-parameter \
+  --name "/infra/terraform/servers/hetzner_server_1_ipv4" \
+  --type String \
+  --value "your-server-ip" \
+  --overwrite
 
-**DIGITALOCEAN_TOKEN**
-- Go to: DigitalOcean Console → API → Generate New Token
-- Create token with Read & Write scopes
-- Copy the token
+# Set DNS secrets (example for DKIM)
+aws ssm put-parameter \
+  --name "/infra/terraform/dns/schluesselmomente_dkim" \
+  --type SecureString \
+  --value "your-dkim-value" \
+  --overwrite
 
-**DIGITALOCEAN_DROPLET_1_IPV4**
-- IP address of your DigitalOcean droplet (if you have one)
+# ... repeat for all other parameters
+```
 
-### 3.4 DNS & Domain Secrets
+**List of Parameters to Set:**
 
-**SCHLUESSELMOMENTE_DKIM**
-- DKIM value for schluesselmomente-freiburg.de
-- Find in: Your current terraform.tfvars or email provider
+| Parameter Path | Description |
+|----------------|-------------|
+| `/infra/terraform/providers/hcloud_token` | Hetzner Cloud API token |
+| `/infra/terraform/providers/digitalocean_token` | DigitalOcean API token |
+| `/infra/terraform/servers/hetzner_server_1_ipv4` | Hetzner server IP |
+| `/infra/terraform/servers/digitalocean_droplet_1_ipv4` | DigitalOcean droplet IP |
+| `/infra/terraform/servers/hcloud_ssh_key` | SSH public key for Hetzner |
+| `/infra/terraform/dns/schluesselmomente_dkim` | DKIM for schluesselmomente |
+| `/infra/terraform/dns/schluesselmomente_zmail_dkim` | Zoho DKIM |
+| `/infra/terraform/dns/schluesselmomente_spf` | SPF record |
+| `/infra/terraform/dns/schluesselmomente_zoho_verification` | Zoho verification |
+| `/infra/terraform/dns/portfolio_netlify_challenge` | Netlify challenge |
+| `/infra/terraform/aws/account_id` | AWS Account ID |
 
-**SCHLUESSELMOMENTE_ZMAIL_DKIM**
-- Zoho Mail DKIM value
-
-**SCHLUESSELMOMENTE_SPF**
-- SPF TXT record value
-
-**SCHLUESSELMOMENTE_ZOHO_VERIFICATION**
-- Zoho domain verification TXT value
-
-**PORTFOLIO_NETLIFY_CHALLENGE**
-- Netlify DNS challenge TXT value (if using Netlify)
+**Benefits of this approach:**
+- ✅ Only 1 GitHub secret needed (AWS_ACCOUNT_ID)
+- ✅ All secrets in one place (AWS Parameter Store)
+- ✅ Easy to rotate/update values
+- ✅ Works with existing infrastructure patterns
 
 ## 4. Test the Workflow
 

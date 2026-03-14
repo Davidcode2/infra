@@ -15,6 +15,7 @@ on:
 env:
   TF_VERSION: 1.7.0
   AWS_REGION: eu-central-1
+  TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
 
 jobs:
   terraform-plan:
@@ -27,12 +28,83 @@ jobs:
         working-directory: terraform
     
     permissions:
+      id-token: write
       contents: read
       pull-requests: write
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/terraform-ci-role
+      
+      - name: Fetch Terraform Secrets from Parameter Store
+        id: fetch-secrets
+        run: |
+          echo "Fetching all terraform secrets from Parameter Store..."
+          
+          # Get all parameters under /infra/terraform/ path
+          PARAMS=$(aws ssm get-parameters-by-path \
+            --path "/infra/terraform" \
+            --recursive \
+            --with-decryption \
+            --query 'Parameters[*].[Name,Value]' \
+            --output json)
+          
+          # Convert parameter names to environment variable names and export values
+          echo "$PARAMS" | jq -c '.[]' | while read -r param; do
+            name=$(echo "$param" | jq -r '.[0]')
+            value=$(echo "$param" | jq -r '.[1]')
+            
+            # Convert /infra/terraform/providers/hcloud_token to TF_VAR_hcloud_token
+            # Convert /infra/terraform/dns/schluesselmomente_dkim to TF_VAR_schluesselmomente_dkim
+            var_name=$(echo "$name" | sed 's|/infra/terraform/||g' | sed 's|/|_|g')
+            
+            # Handle special case for providers prefix
+            if [[ "$var_name" == providers_* ]]; then
+              var_name=${var_name#providers_}
+            fi
+            
+            # Handle special case for dns prefix
+            if [[ "$var_name" == dns_* ]]; then
+              var_name=${var_name#dns_}
+            fi
+            
+            # Handle special case for servers prefix
+            if [[ "$var_name" == servers_* ]]; then
+              var_name=${var_name#servers_}
+            fi
+            
+            # Handle special case for aws prefix
+            if [[ "$var_name" == aws_* ]]; then
+              var_name=${var_name#aws_}
+            fi
+            
+            # Map to expected TF_VAR names
+            case "$var_name" in
+              "hcloud_token") tf_var="TF_VAR_hcloud_token" ;;
+              "digitalocean_token") tf_var="TF_VAR_digitalocean_token" ;;
+              "hetzner_server_1_ipv4") tf_var="TF_VAR_hetzner_cloud_server_1_ipv4" ;;
+              "digitalocean_droplet_1_ipv4") tf_var="TF_VAR_digitalocean_droplet_1_ipv4" ;;
+              "hcloud_ssh_key") tf_var="TF_VAR_hcloud_ssh_key" ;;
+              "schluesselmomente_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_DKIM_value" ;;
+              "schluesselmomente_zmail_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_ZMAIL_DKIM_value" ;;
+              "schluesselmomente_spf") tf_var="TF_VAR_schluesselmomente_freiburg_de_SPF_TXT_value" ;;
+              "schluesselmomente_zoho_verification") tf_var="TF_VAR_schluesselmomente_freiburg_de_zoho_verification_TXT_value" ;;
+              "portfolio_netlify_challenge") tf_var="TF_VAR_portfolio_netlify_challenge_txt" ;;
+              "account_id") tf_var="AWS_ACCOUNT_ID" ;;
+              *) tf_var="TF_VAR_$var_name" ;;
+            esac
+            
+            echo "$tf_var=$value" >> $GITHUB_ENV
+            echo "Exported: $tf_var"
+          done
+          
+          echo "Secrets loaded successfully"
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -47,9 +119,6 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       
       - name: Terraform Validate
         id: validate
@@ -58,21 +127,6 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false -out=tfplan
-        env:
-          TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
-          TF_VAR_digitalocean_token: ${{ secrets.DIGITALOCEAN_TOKEN }}
-          TF_VAR_hcloud_ssh_key: ${{ secrets.HCLOUD_SSH_KEY }}
-          TF_VAR_digitalocean_droplet_1_ipv4: ${{ secrets.DIGITALOCEAN_DROPLET_1_IPV4 }}
-          TF_VAR_hetzner_cloud_server_1_ipv4: ${{ secrets.HETZNER_CLOUD_SERVER_1_IPV4 }}
-          TF_VAR_schluesselmomente_freiburg_de_DKIM_value: ${{ secrets.SCHLUESSELMOMENTE_DKIM }}
-          TF_VAR_schluesselmomente_freiburg_de_ZMAIL_DKIM_value: ${{ secrets.SCHLUESSELMOMENTE_ZMAIL_DKIM }}
-          TF_VAR_schluesselmomente_freiburg_de_SPF_TXT_value: ${{ secrets.SCHLUESSELMOMENTE_SPF }}
-          TF_VAR_schluesselmomente_freiburg_de_zoho_verification_TXT_value: ${{ secrets.SCHLUESSELMOMENTE_ZOHO_VERIFICATION }}
-          TF_VAR_portfolio_netlify_challenge_txt: ${{ secrets.PORTFOLIO_NETLIFY_CHALLENGE }}
-          TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          TF_VAR_ssh_private_key_path: /tmp/ssh_key
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         continue-on-error: true
       
       - name: Comment PR with Plan
@@ -119,11 +173,82 @@ jobs:
         working-directory: terraform
     
     permissions:
+      id-token: write
       contents: read
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/terraform-ci-role
+      
+      - name: Fetch Terraform Secrets from Parameter Store
+        id: fetch-secrets
+        run: |
+          echo "Fetching all terraform secrets from Parameter Store..."
+          
+          # Get all parameters under /infra/terraform/ path
+          PARAMS=$(aws ssm get-parameters-by-path \
+            --path "/infra/terraform" \
+            --recursive \
+            --with-decryption \
+            --query 'Parameters[*].[Name,Value]' \
+            --output json)
+          
+          # Convert parameter names to environment variable names and export values
+          echo "$PARAMS" | jq -c '.[]' | while read -r param; do
+            name=$(echo "$param" | jq -r '.[0]')
+            value=$(echo "$param" | jq -r '.[1]')
+            
+            # Convert /infra/terraform/providers/hcloud_token to TF_VAR_hcloud_token
+            # Convert /infra/terraform/dns/schluesselmomente_dkim to TF_VAR_schluesselmomente_dkim
+            var_name=$(echo "$name" | sed 's|/infra/terraform/||g' | sed 's|/|_|g')
+            
+            # Handle special case for providers prefix
+            if [[ "$var_name" == providers_* ]]; then
+              var_name=${var_name#providers_}
+            fi
+            
+            # Handle special case for dns prefix
+            if [[ "$var_name" == dns_* ]]; then
+              var_name=${var_name#dns_}
+            fi
+            
+            # Handle special case for servers prefix
+            if [[ "$var_name" == servers_* ]]; then
+              var_name=${var_name#servers_}
+            fi
+            
+            # Handle special case for aws prefix
+            if [[ "$var_name" == aws_* ]]; then
+              var_name=${var_name#aws_}
+            fi
+            
+            # Map to expected TF_VAR names
+            case "$var_name" in
+              "hcloud_token") tf_var="TF_VAR_hcloud_token" ;;
+              "digitalocean_token") tf_var="TF_VAR_digitalocean_token" ;;
+              "hetzner_server_1_ipv4") tf_var="TF_VAR_hetzner_cloud_server_1_ipv4" ;;
+              "digitalocean_droplet_1_ipv4") tf_var="TF_VAR_digitalocean_droplet_1_ipv4" ;;
+              "hcloud_ssh_key") tf_var="TF_VAR_hcloud_ssh_key" ;;
+              "schluesselmomente_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_DKIM_value" ;;
+              "schluesselmomente_zmail_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_ZMAIL_DKIM_value" ;;
+              "schluesselmomente_spf") tf_var="TF_VAR_schluesselmomente_freiburg_de_SPF_TXT_value" ;;
+              "schluesselmomente_zoho_verification") tf_var="TF_VAR_schluesselmomente_freiburg_de_zoho_verification_TXT_value" ;;
+              "portfolio_netlify_challenge") tf_var="TF_VAR_portfolio_netlify_challenge_txt" ;;
+              "account_id") tf_var="AWS_ACCOUNT_ID" ;;
+              *) tf_var="TF_VAR_$var_name" ;;
+            esac
+            
+            echo "$tf_var=$value" >> $GITHUB_ENV
+            echo "Exported: $tf_var"
+          done
+          
+          echo "Secrets loaded successfully"
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -132,24 +257,6 @@ jobs:
       
       - name: Terraform Init
         run: terraform init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
-        env:
-          TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
-          TF_VAR_digitalocean_token: ${{ secrets.DIGITALOCEAN_TOKEN }}
-          TF_VAR_hcloud_ssh_key: ${{ secrets.HCLOUD_SSH_KEY }}
-          TF_VAR_digitalocean_droplet_1_ipv4: ${{ secrets.DIGITALOCEAN_DROPLET_1_IPV4 }}
-          TF_VAR_hetzner_cloud_server_1_ipv4: ${{ secrets.HETZNER_CLOUD_SERVER_1_IPV4 }}
-          TF_VAR_schluesselmomente_freiburg_de_DKIM_value: ${{ secrets.SCHLUESSELMOMENTE_DKIM }}
-          TF_VAR_schluesselmomente_freiburg_de_ZMAIL_DKIM_value: ${{ secrets.SCHLUESSELMOMENTE_ZMAIL_DKIM }}
-          TF_VAR_schluesselmomente_freiburg_de_SPF_TXT_value: ${{ secrets.SCHLUESSELMOMENTE_SPF }}
-          TF_VAR_schluesselmomente_freiburg_de_zoho_verification_TXT_value: ${{ secrets.SCHLUESSELMOMENTE_ZOHO_VERIFICATION }}
-          TF_VAR_portfolio_netlify_challenge_txt: ${{ secrets.PORTFOLIO_NETLIFY_CHALLENGE }}
-          TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          TF_VAR_ssh_private_key_path: /tmp/ssh_key
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

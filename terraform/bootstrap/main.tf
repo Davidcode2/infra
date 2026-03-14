@@ -1,6 +1,6 @@
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -24,7 +24,7 @@ resource "aws_s3_bucket" "terraform_state" {
 
   # Prevent accidental deletion of this bucket
   lifecycle {
-    prevent_destroy = false  # Set to true after initial creation
+    prevent_destroy = false # Set to true after initial creation
   }
 
   tags = {
@@ -72,6 +72,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
   rule {
     id     = "archive-old-versions"
     status = "Enabled"
+
+    filter {
+      prefix = "" # Empty prefix means apply to all objects
+    }
 
     noncurrent_version_transition {
       noncurrent_days = 90
