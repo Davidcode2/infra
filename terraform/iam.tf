@@ -164,6 +164,7 @@ resource "aws_iam_role_policy" "terraform_ci_policy" {
           "iam:GetRole",
           "iam:ListRolePolicies",
           "iam:GetRolePolicy",
+          "iam:ListAttachedRolePolicies",
           "iam:GetOpenIDConnectProvider",
           "iam:GetUser",
           "iam:GetUserPolicy"
