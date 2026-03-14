@@ -59,7 +59,7 @@ module "projects" {
 resource "hcloud_server" "hetzner_ubuntu-4gb-nbg1-1" {
   name        = "ubuntu-4gb-nbg1-1"
   image       = "ubuntu-24.04"
-  server_type = "cx22"
+  server_type = "cx23"
   location    = "nbg1"
 }
 
