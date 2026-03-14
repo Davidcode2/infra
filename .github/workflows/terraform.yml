@@ -1,0 +1,262 @@
+name: Terraform CI/CD
+
+on:
+  pull_request:
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yml'
+
+env:
+  TF_VERSION: 1.7.0
+  AWS_REGION: eu-central-1
+  TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    defaults:
+      run:
+        working-directory: terraform
+    
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/terraform-ci-role
+      
+      - name: Fetch Terraform Secrets from Parameter Store
+        id: fetch-secrets
+        run: |
+          echo "Fetching all terraform secrets from Parameter Store..."
+          
+          # Get all parameters under /infra/terraform/ path
+          PARAMS=$(aws ssm get-parameters-by-path \
+            --path "/infra/terraform" \
+            --recursive \
+            --with-decryption \
+            --query 'Parameters[*].[Name,Value]' \
+            --output json)
+          
+          # Convert parameter names to environment variable names and export values
+          echo "$PARAMS" | jq -c '.[]' | while read -r param; do
+            name=$(echo "$param" | jq -r '.[0]')
+            value=$(echo "$param" | jq -r '.[1]')
+            
+            # Convert /infra/terraform/providers/hcloud_token to TF_VAR_hcloud_token
+            # Convert /infra/terraform/dns/schluesselmomente_dkim to TF_VAR_schluesselmomente_dkim
+            var_name=$(echo "$name" | sed 's|/infra/terraform/||g' | sed 's|/|_|g')
+            
+            # Handle special case for providers prefix
+            if [[ "$var_name" == providers_* ]]; then
+              var_name=${var_name#providers_}
+            fi
+            
+            # Handle special case for dns prefix
+            if [[ "$var_name" == dns_* ]]; then
+              var_name=${var_name#dns_}
+            fi
+            
+            # Handle special case for servers prefix
+            if [[ "$var_name" == servers_* ]]; then
+              var_name=${var_name#servers_}
+            fi
+            
+            # Handle special case for aws prefix
+            if [[ "$var_name" == aws_* ]]; then
+              var_name=${var_name#aws_}
+            fi
+            
+            # Map to expected TF_VAR names
+            case "$var_name" in
+              "hcloud_token") tf_var="TF_VAR_hcloud_token" ;;
+              "digitalocean_token") tf_var="TF_VAR_digitalocean_token" ;;
+              "hetzner_server_1_ipv4") tf_var="TF_VAR_hetzner_cloud_server_1_ipv4" ;;
+              "digitalocean_droplet_1_ipv4") tf_var="TF_VAR_digitalocean_droplet_1_ipv4" ;;
+              "hcloud_ssh_key") tf_var="TF_VAR_hcloud_ssh_key" ;;
+              "schluesselmomente_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_DKIM_value" ;;
+              "schluesselmomente_zmail_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_ZMAIL_DKIM_value" ;;
+              "schluesselmomente_spf") tf_var="TF_VAR_schluesselmomente_freiburg_de_SPF_TXT_value" ;;
+              "schluesselmomente_zoho_verification") tf_var="TF_VAR_schluesselmomente_freiburg_de_zoho_verification_TXT_value" ;;
+              "portfolio_netlify_challenge") tf_var="TF_VAR_portfolio_netlify_challenge_txt" ;;
+              "account_id") tf_var="AWS_ACCOUNT_ID" ;;
+              *) tf_var="TF_VAR_$var_name" ;;
+            esac
+            
+            echo "$tf_var=$value" >> $GITHUB_ENV
+            echo "Exported: $tf_var"
+          done
+          
+          echo "Secrets loaded successfully"
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+      
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+      
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false -out=tfplan
+        continue-on-error: true
+      
+      - name: Comment PR with Plan
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`terraform
+            ${process.env.PLAN}
+            \`\`\`
+            
+            </details>
+            
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+      
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    defaults:
+      run:
+        working-directory: terraform
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/terraform-ci-role
+      
+      - name: Fetch Terraform Secrets from Parameter Store
+        id: fetch-secrets
+        run: |
+          echo "Fetching all terraform secrets from Parameter Store..."
+          
+          # Get all parameters under /infra/terraform/ path
+          PARAMS=$(aws ssm get-parameters-by-path \
+            --path "/infra/terraform" \
+            --recursive \
+            --with-decryption \
+            --query 'Parameters[*].[Name,Value]' \
+            --output json)
+          
+          # Convert parameter names to environment variable names and export values
+          echo "$PARAMS" | jq -c '.[]' | while read -r param; do
+            name=$(echo "$param" | jq -r '.[0]')
+            value=$(echo "$param" | jq -r '.[1]')
+            
+            # Convert /infra/terraform/providers/hcloud_token to TF_VAR_hcloud_token
+            # Convert /infra/terraform/dns/schluesselmomente_dkim to TF_VAR_schluesselmomente_dkim
+            var_name=$(echo "$name" | sed 's|/infra/terraform/||g' | sed 's|/|_|g')
+            
+            # Handle special case for providers prefix
+            if [[ "$var_name" == providers_* ]]; then
+              var_name=${var_name#providers_}
+            fi
+            
+            # Handle special case for dns prefix
+            if [[ "$var_name" == dns_* ]]; then
+              var_name=${var_name#dns_}
+            fi
+            
+            # Handle special case for servers prefix
+            if [[ "$var_name" == servers_* ]]; then
+              var_name=${var_name#servers_}
+            fi
+            
+            # Handle special case for aws prefix
+            if [[ "$var_name" == aws_* ]]; then
+              var_name=${var_name#aws_}
+            fi
+            
+            # Map to expected TF_VAR names
+            case "$var_name" in
+              "hcloud_token") tf_var="TF_VAR_hcloud_token" ;;
+              "digitalocean_token") tf_var="TF_VAR_digitalocean_token" ;;
+              "hetzner_server_1_ipv4") tf_var="TF_VAR_hetzner_cloud_server_1_ipv4" ;;
+              "digitalocean_droplet_1_ipv4") tf_var="TF_VAR_digitalocean_droplet_1_ipv4" ;;
+              "hcloud_ssh_key") tf_var="TF_VAR_hcloud_ssh_key" ;;
+              "schluesselmomente_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_DKIM_value" ;;
+              "schluesselmomente_zmail_dkim") tf_var="TF_VAR_schluesselmomente_freiburg_de_ZMAIL_DKIM_value" ;;
+              "schluesselmomente_spf") tf_var="TF_VAR_schluesselmomente_freiburg_de_SPF_TXT_value" ;;
+              "schluesselmomente_zoho_verification") tf_var="TF_VAR_schluesselmomente_freiburg_de_zoho_verification_TXT_value" ;;
+              "portfolio_netlify_challenge") tf_var="TF_VAR_portfolio_netlify_challenge_txt" ;;
+              "account_id") tf_var="AWS_ACCOUNT_ID" ;;
+              *) tf_var="TF_VAR_$var_name" ;;
+            esac
+            
+            echo "$tf_var=$value" >> $GITHUB_ENV
+            echo "Exported: $tf_var"
+          done
+          
+          echo "Secrets loaded successfully"
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false

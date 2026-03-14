@@ -13,6 +13,15 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  # S3 backend for remote state storage
+  backend "s3" {
+    bucket         = "jakob-terraform-state"
+    key            = "infra/terraform.tfstate"
+    region         = "eu-central-1"
+    dynamodb_table = "terraform-state-lock"
+    encrypt        = true
+  }
 }
 
 provider "digitalocean" {
@@ -24,8 +33,9 @@ provider "hcloud" {
 }
 
 provider "aws" {
-  region  = "eu-central-1"
-  profile = "admin"
+  region = "eu-central-1"
+  # Uses AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables
+  # or the default AWS credentials file for local development
 }
 
 module "dns" {
@@ -40,8 +50,8 @@ module "dns" {
 }
 
 module "projects" {
-  source                      = "./projects"
-  hetzner_cloud_server_1_ipv4 = var.hetzner_cloud_server_1_ipv4
+  source                                            = "./projects"
+  hetzner_cloud_server_1_ipv4                       = var.hetzner_cloud_server_1_ipv4
   hetzner_cloud_server_1_deployment_private_ssh_key = tls_private_key.hetzner_private_key.private_key_pem
 }
 
@@ -88,7 +98,7 @@ resource "hcloud_server" "k8s_node" {
   count       = 3 # Create three identical nodes
   name        = "k8s-node-${count.index + 1}"
   image       = "ubuntu-24.04"
-  server_type = "cx23" 
+  server_type = "cx23"
   location    = "nbg1"
   ssh_keys    = [hcloud_ssh_key.hetzner_ssh_key.id]
 
