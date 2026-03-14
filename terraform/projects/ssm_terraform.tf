@@ -57,6 +57,12 @@ locals {
       description = "AWS Account ID"
       type        = "String"
     }
+
+    # SSH Configuration
+    "/infra/terraform/ssh_private_key_path" = {
+      description = "Path to SSH private key for server access"
+      type        = "String"
+    }
   }
 }
 

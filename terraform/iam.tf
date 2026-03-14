@@ -108,12 +108,19 @@ resource "aws_iam_role_policy" "terraform_ci_policy" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
           "ssm:PutParameter",
-          "ssm:DeleteParameter"
+          "ssm:DeleteParameter",
+          "ssm:ListTagsForResource"
         ]
         Resource = [
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/infra/terraform",
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/infra/terraform/*",
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/ssh/*"
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/ssh/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/teachme/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/joy_alemazung/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/schluesselmomente/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/umami/*"
         ]
       },
       {
@@ -150,6 +157,23 @@ resource "aws_iam_role_policy" "terraform_ci_policy" {
           "dynamodb:DeleteItem"
         ]
         Resource = "arn:aws:dynamodb:eu-central-1:${var.aws_account_id}:table/terraform-state-lock"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:GetRole",
+          "iam:ListRolePolicies",
+          "iam:GetRolePolicy",
+          "iam:GetOpenIDConnectProvider",
+          "iam:GetUser",
+          "iam:GetUserPolicy"
+        ]
+        Resource = [
+          "arn:aws:iam::${var.aws_account_id}:role/ci-role",
+          "arn:aws:iam::${var.aws_account_id}:role/terraform-ci-role",
+          "arn:aws:iam::${var.aws_account_id}:oidc-provider/token.actions.githubusercontent.com",
+          "arn:aws:iam::${var.aws_account_id}:user/external-secrets-ssm"
+        ]
       }
     ]
   })
