@@ -258,5 +258,12 @@ jobs:
       - name: Terraform Init
         run: terraform init
       
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+      # DISABLED: Terraform Apply - uncomment after verifying plan works correctly
+      # - name: Terraform Apply
+      #   run: terraform apply -auto-approve -input=false
+      
+      - name: Terraform Plan Only (Apply Disabled)
+        run: |
+          echo "⚠️ Apply is currently disabled for safety"
+          echo "Review the plan output above, then uncomment the apply step when ready"
+          terraform plan -no-color -input=false
