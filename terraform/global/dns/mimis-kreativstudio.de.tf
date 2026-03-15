@@ -1,16 +1,20 @@
+# Points to nginx ingress controller LoadBalancer
 resource "digitalocean_record" "mimis_kreativstudio_de_www_A" {
   domain = digitalocean_domain.mimis_kreativstudio_de.name
   type = "A"
   name = "www"
-  value = var.hetzner_cloud_server_1_ipv4
+  #value = var.hetzner_cloud_server_1_ipv4
+  value  = "49.13.45.106"
   ttl    = 1800
 }
 
+# Points to nginx ingress controller LoadBalancer
 resource "digitalocean_record" "mimis_kreativstudio_de_A" {
   domain = digitalocean_domain.mimis_kreativstudio_de.name
   type   = "A"
   name   = "@"
-  value  = var.hetzner_cloud_server_1_ipv4
+  value  = "49.13.45.106"
+  #value  = var.hetzner_cloud_server_1_ipv4
   ttl    = 1800
 }
 
