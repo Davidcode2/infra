@@ -109,7 +109,8 @@ resource "aws_iam_role_policy" "terraform_ci_policy" {
           "ssm:GetParametersByPath",
           "ssm:PutParameter",
           "ssm:DeleteParameter",
-          "ssm:ListTagsForResource"
+          "ssm:ListTagsForResource",
+          "ssm:AddTagsToResource"
         ]
         Resource = [
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/infra/terraform",
