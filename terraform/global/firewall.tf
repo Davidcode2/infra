@@ -38,3 +38,4 @@ resource "digitalocean_firewall" "teachme_firewall" {
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 }
+
