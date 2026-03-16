@@ -121,7 +121,8 @@ resource "aws_iam_role_policy" "terraform_ci_policy" {
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly/*",
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/joy_alemazung/*",
           "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/schluesselmomente/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/umami/*"
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/umami/*",
+          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/message-router/*"
         ]
       },
       {
