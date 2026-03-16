@@ -1,11 +1,11 @@
 # Points to business-website ingress
 resource "digitalocean_record" "jakob_lingel_dev_www_A" {
   domain = digitalocean_domain.jakob-lingel-dev.name
-  type = "A"
-  name = "www"
+  type   = "A"
+  name   = "www"
   #value = var.hetzner_cloud_server_1_ipv4
-  value  = "49.13.45.106"
-  ttl    = 1800
+  value = "49.13.45.106"
+  ttl   = 1800
 }
 
 # Points to business-website ingress
@@ -15,7 +15,7 @@ resource "digitalocean_record" "jakob_lingel_dev_A" {
   name   = "@"
   value  = "49.13.45.106"
   #value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 1800
+  ttl = 1800
 }
 
 # Points to the existing portfolio site (jakob-lingel app)
@@ -25,7 +25,7 @@ resource "digitalocean_record" "jakob_lingel_dev_portfolio_A" {
   name   = "portfolio"
   value  = "49.13.45.106"
   #value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 1800
+  ttl = 1800
 }
 
 # immoly CNAME record
@@ -159,6 +159,15 @@ resource "digitalocean_record" "jakob_lingel_dev_telemetry" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "telemetry"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# notifications CNAME record for message-router
+resource "digitalocean_record" "jakob_lingel_dev_notifications" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "notifications"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
   ttl    = 1800
 }
