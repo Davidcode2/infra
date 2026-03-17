@@ -40,14 +40,7 @@ resource "aws_iam_role_policy" "ci-policy" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        Resource = [
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/ssh/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/joy_alemazung*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/home_at_sea*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/teachme*"
-        ]
+        Resource = local.ci_role_app_paths
       }
     ]
   })
@@ -112,18 +105,7 @@ resource "aws_iam_role_policy" "terraform_ci_policy" {
           "ssm:ListTagsForResource",
           "ssm:AddTagsToResource"
         ]
-        Resource = [
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/infra/terraform",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/infra/terraform/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/compute/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/ssh/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/teachme/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/immoly/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/joy_alemazung/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/schluesselmomente/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/umami/*",
-          "arn:aws:ssm:eu-central-1:${var.aws_account_id}:parameter/message-router/*"
-        ]
+        Resource = local.terraform_ci_ssm_paths
       },
       {
         Effect   = "Allow"
@@ -202,14 +184,7 @@ resource "aws_iam_user_policy" "external_secrets_ssm" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        Resource = [
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/immoly/*",
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/joy_alemazung/*",
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/schluesselmomente/*",
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/umami/*",
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/home_at_sea/*",
-          "arn:aws:ssm:eu-central-1:${data.aws_caller_identity.current.account_id}:parameter/teachme*"
-        ]
+        Resource = local.eso_ssm_paths
       },
       {
         Effect   = "Allow"
