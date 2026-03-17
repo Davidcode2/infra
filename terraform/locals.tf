@@ -49,7 +49,7 @@ locals {
 
   # ESO paths (path prefix /*, uses data.aws_caller_identity.current.account_id)
   eso_ssm_paths = [
-    for app_name in keys(local.app_patterns) : "arn:aws:ssm:${local.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${app_name}/*"
+    for app_name in values(local.app_patterns) : "arn:aws:ssm:${local.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${app_name}/*"
   ]
 }
 
