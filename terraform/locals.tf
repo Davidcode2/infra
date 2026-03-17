@@ -52,3 +52,4 @@ locals {
     for app_name in keys(local.app_patterns) : "arn:aws:ssm:${local.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${app_name}/*"
   ]
 }
+
