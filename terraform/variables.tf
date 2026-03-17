@@ -76,4 +76,3 @@ variable "k8s_load_balancer_ipv4" {
   sensitive   = false
   default     = ""
 }
-
