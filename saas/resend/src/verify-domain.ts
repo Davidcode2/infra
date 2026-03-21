@@ -60,11 +60,12 @@ async function verifyDomain(): Promise<void> {
   
   let apiKey: string;
   try {
-    const credentials = await loadCredentials();
+    const credentials = loadCredentials();
     apiKey = credentials.resendApiKey;
   } catch (error) {
     console.error('❌ Error loading credentials from SSM:', error);
-    console.error('\n   Make sure AWS credentials are configured locally');
+    console.error('\n   Make sure AWS CLI is configured:');
+    console.error('   - Run: aws configure');
     process.exit(1);
   }
   

@@ -11,7 +11,6 @@
     "check-dns": "echo 'Checking DNS propagation...' && nslookup -type=TXT resend._domainkey.notifications.jakob-lingel.dev && nslookup -type=TXT send.notifications.jakob-lingel.dev && nslookup -type=MX send.notifications.jakob-lingel.dev"
   },
   "dependencies": {
-    "@aws-sdk/client-ssm": "^3.0.0",
     "resend": "^4.0.0"
   },
   "devDependencies": {

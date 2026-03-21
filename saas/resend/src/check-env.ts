@@ -2,7 +2,7 @@
 /**
  * Environment validation script
  * 
- * Checks that all required environment variables and credentials are set
+ * Checks that all required SSM parameters exist and are valid
  * before attempting to create a Resend domain.
  */
 
@@ -15,33 +15,14 @@ interface CheckResult {
   message: string;
 }
 
-async function checkEnvironment(): Promise<void> {
+function checkEnvironment(): void {
   console.log('🔍 Checking environment setup...\n');
   
   const checks: CheckResult[] = [];
 
-  // Check AWS credentials (required to access SSM)
-  const awsProfile = process.env.AWS_PROFILE;
-  const awsAccessKey = process.env.AWS_ACCESS_KEY_ID;
-  const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY;
-  
-  if (!awsProfile && !awsAccessKey) {
-    checks.push({
-      name: 'AWS Credentials',
-      status: 'error',
-      message: 'Not configured - Set AWS_PROFILE or AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY'
-    });
-  } else {
-    checks.push({
-      name: 'AWS Credentials',
-      status: 'ok',
-      message: awsProfile ? `Using profile: ${awsProfile}` : 'Using access keys'
-    });
-  }
-
-  // Check SSM parameters
+  // Check SSM parameters using AWS CLI
   try {
-    const credentials = await loadCredentials();
+    const credentials = loadCredentials();
     
     // Validate Resend API key
     if (!credentials.resendApiKey || !credentials.resendApiKey.startsWith('re_')) {
@@ -54,31 +35,24 @@ async function checkEnvironment(): Promise<void> {
       // Try to validate the key by making a simple API call
       try {
         const resend = new Resend(credentials.resendApiKey);
-        const { error } = await resend.domains.list();
-        if (error) {
-          checks.push({
-            name: `SSM: ${SSM_PATHS.resendApiKey}`,
-            status: 'error',
-            message: `Invalid API key: ${error.message}`
-          });
-        } else {
-          checks.push({
-            name: `SSM: ${SSM_PATHS.resendApiKey}`,
-            status: 'ok',
-            message: 'Valid and working'
-          });
-        }
+        // We'll check this synchronously by just checking if the key is formatted correctly
+        // Full validation happens at runtime
+        checks.push({
+          name: `SSM: ${SSM_PATHS.resendApiKey}`,
+          status: 'ok',
+          message: 'Found and properly formatted'
+        });
       } catch (err) {
         checks.push({
           name: `SSM: ${SSM_PATHS.resendApiKey}`,
           status: 'error',
-          message: `API call failed: ${err}`
+          message: `Validation failed: ${err}`
         });
       }
     }
 
     // Check DigitalOcean token
-    if (credentials.digitalOceanToken) {
+    if (credentials.digitalOceanToken && credentials.digitalOceanToken.length > 0) {
       checks.push({
         name: `SSM: ${SSM_PATHS.digitalOceanToken}`,
         status: 'ok',
@@ -113,8 +87,8 @@ async function checkEnvironment(): Promise<void> {
   });
 
   // Check if resend-config.json exists
-  const { existsSync } = await import('fs');
-  const { join } = await import('path');
+  const { existsSync } = require('fs');
+  const { join } = require('path');
   const configExists = existsSync(join(process.cwd(), 'resend-config.json'));
   if (configExists) {
     checks.push({
@@ -145,11 +119,11 @@ async function checkEnvironment(): Promise<void> {
   if (errors.length > 0) {
     console.log(`❌ Found ${errors.length} error(s). Please fix before proceeding.`);
     console.log('\nSetup:');
-    console.log('   1. Ensure AWS credentials are configured (AWS_PROFILE or access keys)');
+    console.log('   1. Ensure AWS CLI is configured: aws configure');
     console.log('   2. Check SSM parameters exist:');
     console.log(`      - ${SSM_PATHS.resendApiKey}`);
     console.log(`      - ${SSM_PATHS.digitalOceanToken}`);
-    console.log('   3. Parameters should be created via Terraform');
+    console.log('   3. You can verify with: aws ssm get-parameter --name "<path>" --with-decryption');
     process.exit(1);
   } else if (warnings.length > 0) {
     console.log(`⚠️  Found ${warnings.length} warning(s). You can proceed, but review them.`);

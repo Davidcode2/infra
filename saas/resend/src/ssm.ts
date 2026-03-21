@@ -2,37 +2,26 @@
 /**
  * AWS SSM Parameter Store utilities
  * 
- * Loads credentials from AWS SSM Parameter Store.
- * Assumes AWS credentials are configured locally (AWS_PROFILE, etc.)
+ * Loads credentials from AWS SSM Parameter Store using AWS CLI.
+ * Assumes AWS CLI is configured (via `aws configure` or ~/.aws/credentials)
  */
 
-import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
-
-const ssmClient = new SSMClient({ region: 'eu-central-1' });
+import { execSync } from 'child_process';
 
 // SSM parameter paths
 export const SSM_PATHS = {
-  resendApiKey: '/saas/resend/api-key',
+  resendApiKey: '/message-router/resend-api-key',
   digitalOceanToken: '/infra/terraform/digitalocean/api_token',
 };
 
 /**
- * Get a parameter value from AWS SSM
+ * Get a parameter value from AWS SSM using AWS CLI
  */
-export async function getSSMParameter(name: string, withDecryption = true): Promise<string> {
+export function getSSMParameter(name: string, withDecryption = true): string {
   try {
-    const command = new GetParameterCommand({
-      Name: name,
-      WithDecryption: withDecryption,
-    });
-    
-    const response = await ssmClient.send(command);
-    
-    if (!response.Parameter?.Value) {
-      throw new Error(`Parameter ${name} not found or has no value`);
-    }
-    
-    return response.Parameter.Value;
+    const command = `aws ssm get-parameter --name "${name}" --with-decryption=${withDecryption} --query 'Parameter.Value' --output text --region eu-central-1`;
+    const result = execSync(command, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+    return result.trim();
   } catch (error) {
     throw new Error(`Failed to get SSM parameter ${name}: ${error}`);
   }
@@ -41,14 +30,12 @@ export async function getSSMParameter(name: string, withDecryption = true): Prom
 /**
  * Load all required credentials from SSM
  */
-export async function loadCredentials(): Promise<{
+export function loadCredentials(): {
   resendApiKey: string;
   digitalOceanToken: string;
-}> {
-  const [resendApiKey, digitalOceanToken] = await Promise.all([
-    getSSMParameter(SSM_PATHS.resendApiKey),
-    getSSMParameter(SSM_PATHS.digitalOceanToken),
-  ]);
+} {
+  const resendApiKey = getSSMParameter(SSM_PATHS.resendApiKey);
+  const digitalOceanToken = getSSMParameter(SSM_PATHS.digitalOceanToken);
 
   return {
     resendApiKey,

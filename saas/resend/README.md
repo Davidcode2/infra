@@ -24,17 +24,17 @@ This tool creates a Resend domain and automatically configures the required DNS 
 npm install
 ```
 
-### 2. Configure AWS Credentials
+### 2. Configure AWS CLI
 
-Ensure AWS credentials are configured to access SSM Parameter Store:
+Ensure AWS CLI is configured (credentials are read from `~/.aws/credentials`):
 
 ```bash
-# Option 1: Using AWS profile
-export AWS_PROFILE=your-profile-name
+# Check if AWS CLI is configured
+aws configure list
 
-# Option 2: Using access keys
-export AWS_ACCESS_KEY_ID=your-access-key
-export AWS_SECRET_ACCESS_KEY=your-secret-key
+# If not configured, run:
+aws configure
+# Enter your AWS Access Key ID, Secret Access Key, and region (eu-central-1)
 ```
 
 ### 3. Verify Environment
@@ -216,10 +216,15 @@ Credentials are sourced from AWS SSM Parameter Store:
 
 | Parameter | Description |
 |-----------|-------------|
-| `/message-router/resend-api-key` | Resend API key for authentication |
+| `/message-router/resend-api-key` | Resend API key for authentication (reused from message-router) |
 | `/infra/terraform/digitalocean/api_token` | DigitalOcean API token for DNS management |
 
 These parameters are created via Terraform in the main infrastructure project.
+
+You can verify they're accessible:
+```bash
+aws ssm get-parameter --name "/message-router/resend-api-key" --with-decryption --query 'Parameter.Value' --output text --region eu-central-1
+```
 
 ## Resources
 

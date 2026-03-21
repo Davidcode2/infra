@@ -45,13 +45,13 @@ async function createDomain(): Promise<void> {
   
   let apiKey: string;
   try {
-    const credentials = await loadCredentials();
+    const credentials = loadCredentials();
     apiKey = credentials.resendApiKey;
   } catch (error) {
     console.error('❌ Error loading credentials from SSM:', error);
-    console.error('\n   Make sure AWS credentials are configured locally:');
-    console.error('   - export AWS_PROFILE=your-profile');
-    console.error('   - Or have ~/.aws/credentials configured');
+    console.error('\n   Make sure AWS CLI is configured:');
+    console.error('   - Run: aws configure');
+    console.error('   - Or check ~/.aws/credentials');
     process.exit(1);
   }
   
