@@ -18,8 +18,9 @@ resource "digitalocean_record" "resend_records" {
   domain = data.digitalocean_domain.jakob_lingel_dev.name
   type   = each.value.type
   name   = each.value.name
-  value  = each.value.value
-  ttl    = 3600
+  # DigitalOcean requires MX record values to end with a dot
+  value = each.value.type == "MX" && !endswith(each.value.value, ".") ? "${each.value.value}." : each.value.value
+  ttl   = 3600
 
   # Only set priority for MX records
   priority = each.value.type == "MX" ? each.value.priority : null
