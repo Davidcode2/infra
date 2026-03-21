@@ -39,7 +39,7 @@ infra/
 
 **Legacy VM** (1 node):
 - `ubuntu-4gb-nbg1-1`
-- Type: CX22 (2 vCPU, 4GB RAM, 40GB SSD)
+- Type: CX23 (2 vCPU, 4GB RAM, 40GB SSD)
 - Runs Docker containers (being migrated to k8s)
 - Hosts the reverse proxy for legacy apps
 - This is where OpenClaw (me) currently runs
@@ -312,16 +312,10 @@ From zero to production:
 - ✅ External Secrets Operator
 - ✅ nginx ingress controller
 
-### Legacy Components (To Migrate)
-- 🔄 Docker reverse proxy on ubuntu-4gb-nbg1-1
-- 🔄 Schlüsselmomente containers
-- 🔄 Mimi's Kreativstudio Ghost
-
 ### Planned Improvements
-- [ ] Move Terraform state to remote backend (S3 + DynamoDB)
-- [ ] Add monitoring (Prometheus + Grafana)
+- [x] Move Terraform state to remote backend (S3 + DynamoDB)
+- [x] Add monitoring (Rwatch + uptime kuma)
 - [ ] Add backup solution for PVCs
-- [ ] Complete migration of legacy Docker containers
 
 ## 🛠️ Working with this Repo
 
