@@ -8,6 +8,8 @@
 
 import { Resend } from 'resend';
 import { loadCredentials, SSM_PATHS } from './ssm.js';
+import { existsSync } from 'fs';
+import { join } from 'path';
 
 interface CheckResult {
   name: string;
@@ -87,8 +89,6 @@ function checkEnvironment(): void {
   });
 
   // Check if resend-config.json exists
-  const { existsSync } = require('fs');
-  const { join } = require('path');
   const configExists = existsSync(join(process.cwd(), 'resend-config.json'));
   if (configExists) {
     checks.push({

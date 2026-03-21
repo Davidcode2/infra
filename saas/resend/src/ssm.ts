@@ -19,7 +19,8 @@ export const SSM_PATHS = {
  */
 export function getSSMParameter(name: string, withDecryption = true): string {
   try {
-    const command = `aws ssm get-parameter --name "${name}" --with-decryption=${withDecryption} --query 'Parameter.Value' --output text --region eu-central-1`;
+    const decryptionFlag = withDecryption ? '--with-decryption' : '';
+    const command = `aws ssm get-parameter --name "${name}" ${decryptionFlag} --query 'Parameter.Value' --output text --region eu-central-1`;
     const result = execSync(command, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
     return result.trim();
   } catch (error) {
