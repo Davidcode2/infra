@@ -10,7 +10,7 @@ import { execSync } from 'child_process';
 
 // SSM parameter paths
 export const SSM_PATHS = {
-  resendApiKey: '/resend/api-key-full',
+  resendApiKey: '/message-router/resend-api-key-full',
   digitalOceanToken: '/infra/terraform/providers/digitalocean_token',
 } as const;
 
