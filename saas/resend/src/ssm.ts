@@ -10,9 +10,9 @@ import { execSync } from 'child_process';
 
 // SSM parameter paths
 export const SSM_PATHS = {
-  resendApiKey: '/message-router/resend-api-key',
-  digitalOceanToken: '/infra/terraform/digitalocean/api_token',
-};
+  resendApiKey: '/resend/api-key-full',
+  digitalOceanToken: '/infra/terraform/providers/digitalocean_token',
+} as const;
 
 /**
  * Get a parameter value from AWS SSM using AWS CLI
