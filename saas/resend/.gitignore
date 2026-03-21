@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build output
+dist/
+*.js
+*.js.map
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+terraform.tfplan
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Note: resend-config.json is intentionally NOT ignored
+# It contains the domain ID and DNS records that are needed for reproducibility
+# and the free tier only allows one domain, so this file is critical
+# resend-config.json
