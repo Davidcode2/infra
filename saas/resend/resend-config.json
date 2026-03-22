@@ -1,0 +1,35 @@
+{
+  "domainName": "notifications.jakob-lingel.dev",
+  "domainId": "26a31fc9-0ddd-43dd-a26b-9d6e95f21243",
+  "region": "eu-west-1",
+  "createdAt": "2026-03-21 21:21:41.51333+00",
+  "records": [
+    {
+      "record": "DKIM",
+      "name": "resend._domainkey.notifications",
+      "value": "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDsy0AXbuPEi5jkBpzBzgKApvDmWCOcWsjK2t98Tvy9ioty/Msj2KYgqbq+WC3cF7ei5SWAnFz/63kVlsmEz4mZoltr5YhZ9JzqUf5/N0Q7oW7YhQVW+Ldltw6Bp9DFhtEd1HtFoX5H4agR5ON8s0RFtROCbXXCOovv382njBgVUwIDAQAB",
+      "type": "TXT",
+      "status": "not_started",
+      "ttl": "Auto"
+    },
+    {
+      "record": "SPF",
+      "name": "send.notifications",
+      "type": "MX",
+      "ttl": "Auto",
+      "status": "not_started",
+      "value": "feedback-smtp.eu-west-1.amazonses.com",
+      "routing_policy": "Auto",
+      "priority": 10
+    },
+    {
+      "record": "SPF",
+      "name": "send.notifications",
+      "value": "v=spf1 include:amazonses.com ~all",
+      "type": "TXT",
+      "ttl": "Auto",
+      "status": "not_started"
+    }
+  ],
+  "status": "not_started"
+}

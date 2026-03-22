@@ -29,7 +29,7 @@ provider "digitalocean" {
 
 # Load DigitalOcean token from AWS SSM
 data "aws_ssm_parameter" "digitalocean_token" {
-  name            = "/infra/terraform/digitalocean/api_token"
+  name            = "/infra/terraform/providers/digitalocean_token"
   with_decryption = true
 }
 
