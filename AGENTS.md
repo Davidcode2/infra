@@ -194,13 +194,21 @@ After the pipeline creates the parameter with "dummy" value:
 #### Other IAM-Restricted Operations
 
 ```bash
-# Update CI role (if needed)
+# Update CI role policy (allows CI to access new SSM paths)
 cd /home/jakob/documents/code/infra/terraform
-terraform apply -target=aws_iam_role.ci-role
+terraform apply -target=aws_iam_role_policy.ci-policy
 
 # Update Terraform CI role
 cd /home/jakob/documents/code/infra/terraform
 terraform apply -target=aws_iam_role.terraform_ci_role
+
+# Update Terraform CI policy (allows pipeline to manage new SSM paths)
+cd /home/jakob/documents/code/infra/terraform
+terraform apply -target=aws_iam_role_policy.terraform_ci_policy
+
+# Update External Secrets Operator policy
+cd /home/jakob/documents/code/infra/terraform
+terraform apply -target=aws_iam_user_policy.external_secrets_ssm
 ```
 
 ### Common Workflows
