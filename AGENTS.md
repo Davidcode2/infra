@@ -10,6 +10,33 @@ This repository defines Jakob's cloud infrastructure as code. Everything is auto
 
 **Hybrid Architecture.** K3s cluster for modern workloads + legacy Docker containers on a single VM (being migrated).
 
+## ⚠️ CRITICAL: Terraform Execution Policy
+
+**AI AGENTS MUST NEVER RUN TERRAFORM COMMANDS.**
+
+Terraform manages production infrastructure and requires:
+- Specific AWS credentials with elevated permissions
+- Human review before making changes
+- Understanding of the full infrastructure context
+
+**Agent Responsibility:**
+- Provide exact commands for the user to copy and run
+- Target specific resources (never run full `terraform apply`)
+- Explain what each command does and why it's needed
+- Wait for user confirmation before suggesting next steps
+
+**User Responsibility:**
+- Review all commands before executing
+- Ensure proper AWS credentials are configured locally
+- Run commands manually and verify output
+- Never copy-paste without understanding
+
+**When is local Terraform needed?**
+The CI pipeline (`terraform-ci-role`) **cannot modify its own IAM permissions**. This security constraint means:
+- Adding new SSM parameter paths → Requires local admin execution
+- Modifying IAM roles/policies → Requires local admin execution
+- Standard resource changes (parameters, DNS, etc.) → Done via CI pipeline automatically
+
 ## 📦 Repository Structure
 
 ```
@@ -130,12 +157,62 @@ terraform plan
 terraform apply
 ```
 
+### Terraform Commands for Local Execution
+
+**AI AGENTS: Provide these commands to the user. NEVER run them yourself.**
+
+When the pipeline cannot complete an operation due to IAM restrictions, use these targeted commands:
+
+#### Adding New SSM Parameter Namespace
+
+When creating an SSM parameter with a NEW path prefix (not in `locals.tf` `app_patterns`):
+
+**Prerequisites:**
+1. Add the new app to `locals.tf` in the `app_patterns` map
+2. Add the SSM parameter resource to appropriate `_ssm.tf` file
+
+**Step 1 - Update IAM permissions (REQUIRED - run locally with admin AWS credentials):**
+```bash
+cd /home/jakob/documents/code/infra/terraform
+
+# Update CI role policy (allows pipeline to manage params in new path)
+terraform apply -target=aws_iam_role_policy.terraform_ci_policy
+
+# Update External Secrets Operator policy (allows ESO to read params)
+terraform apply -target=aws_iam_user_policy.external_secrets_ssm
+```
+
+**Step 2 - Pipeline handles parameter creation:**
+After IAM policies are updated, the CI pipeline can create parameters in the new path automatically on merge to main.
+
+**Step 3 - Set the actual parameter value:**
+After the pipeline creates the parameter with "dummy" value:
+- Open AWS Console → Systems Manager → Parameter Store
+- Find your new parameter
+- Click "Edit" and set the real secret value
+
+#### Other IAM-Restricted Operations
+
+```bash
+# Update CI role (if needed)
+cd /home/jakob/documents/code/infra/terraform
+terraform apply -target=aws_iam_role.ci-role
+
+# Update Terraform CI role
+cd /home/jakob/documents/code/infra/terraform
+terraform apply -target=aws_iam_role.terraform_ci_role
+```
+
 ### Common Workflows
 
 **Make Infrastructure Changes (PR-based):**
 ```bash
-# 1. Create branch
-git checkout -b feat/add-new-resource
+# 0. ALWAYS start from latest main
+git checkout main
+git pull origin main
+
+# 1. Create branch from main
+git checkout -b feat/bd-XXX-description
 
 # 2. Edit Terraform files
 cd terraform
@@ -143,11 +220,11 @@ vim main.tf  # or firewall.tf, etc.
 
 # 3. Commit and push
 git add .
-git commit -m "feat: Add new resource"
-git push -u origin feat/add-new-resource
+git commit -m "feat: Description [bd-XXX]"
+git push -u origin feat/bd-XXX-description
 
 # 4. Create PR
-gh pr create --title "feat: Add new resource"
+gh pr create --title "feat: Description [bd-XXX]"
 
 # 5. Review terraform plan in PR comments
 # 6. Merge PR → terraform apply runs automatically
@@ -321,7 +398,7 @@ From zero to production:
 
 ### Adding a new server
 1. Add resource in `terraform/main.tf`
-2. Run `terraform apply`
+2. **User runs:** `terraform apply`
 3. Update ansible inventory
 4. Configure with appropriate playbook
 
@@ -427,12 +504,22 @@ bd close bd-42 --reason "Completed" --json
 
 ### Workflow for AI Agents
 
-1. **Check ready work**: `bd ready` shows unblocked issues
-2. **Claim your task atomically**: `bd update <id> --claim`
-3. **Work on it**: Implement, test, document
-4. **Discover new work?** Create linked issue:
+**Terraform Policy - ABSOLUTE RULES:**
+- ❌ **NEVER** run `terraform init`, `plan`, `apply`, or `destroy`
+- ❌ **NEVER** suggest running untargeted `terraform apply`
+- ✅ **DO** provide specific `-target=` commands for the user
+- ✅ **DO** wait for user to execute and confirm success
+- ✅ **DO** verify the user ran the commands before proceeding
+
+**Standard Workflow:**
+1. **Start fresh**: `git checkout main && git pull origin main`
+2. **Check ready work**: `bd ready` shows unblocked issues
+3. **Claim your task atomically**: `bd update <id> --claim`
+4. **Create branch**: `git checkout -b feat/bd-XXX-short-description`
+5. **Work on it**: Implement, test, document
+6. **Discover new work?** Create linked issue:
    - `bd create "Found bug" --description="Details about what was found" -p 1 --deps discovered-from:<parent-id>`
-5. **Complete**: `bd close <id> --reason "Done"`
+7. **Complete**: `bd close <id> --reason "Done"`
 
 ### Auto-Sync
 
