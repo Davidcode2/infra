@@ -43,7 +43,7 @@ locals {
   )
 
   terraform_ci_app_paths = [
-    for app_name in values(local.app_patterns) : "${local.ssm_base_path}/${app_name}/*"
+    for app_name in values(local.app_patterns) : "${local.ssm_base_path}/${app_name}*"
   ]
 
   terraform_ci_ssm_paths = concat(local.terraform_ci_infra_paths, local.terraform_ci_app_paths)
