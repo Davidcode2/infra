@@ -25,6 +25,7 @@ locals {
     home_at_sea       = "home_at_sea"
     teachme           = "teachme"
     message_router    = "message-router"
+    mimis_kreativstudio    = "mimis_kreativstudio"
   }
 
   # ci-role patterns (wildcard suffix *)

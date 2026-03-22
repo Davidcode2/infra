@@ -222,6 +222,19 @@ resource "aws_ssm_parameter" "schluesselmomente_be_password" {
 }
 
 #################
+# mimis-kreativstudio #
+#################
+resource "aws_ssm_parameter" "mimis_kreativstudio_notifications_recipient_email_address" {
+  name        = "/mimis-kreativstudio/notifications/recipient_email_address"
+  description = "Notification recipient email address for mimis-kreativstudio"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+#################
 # umami         #
 #################
 resource "aws_ssm_parameter" "umami_db_password" {
