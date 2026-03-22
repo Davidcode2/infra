@@ -18,14 +18,14 @@ locals {
   # - ci-role uses wildcard suffix (*)
   # - terraform-ci-role and ESO use path prefix (/*)
   app_patterns = {
-    immoly            = "immoly"
-    joy_alemazung     = "joy_alemazung"
-    schluesselmomente = "schluesselmomente"
-    umami             = "umami"
-    home_at_sea       = "home_at_sea"
-    teachme           = "teachme"
-    message_router    = "message-router"
-    mimis_kreativstudio    = "mimis_kreativstudio"
+    immoly              = "immoly"
+    joy_alemazung       = "joy_alemazung"
+    schluesselmomente   = "schluesselmomente"
+    umami               = "umami"
+    home_at_sea         = "home_at_sea"
+    teachme             = "teachme"
+    message_router      = "message-router"
+    mimis_kreativstudio = "mimis-kreativstudio"
   }
 
   # ci-role patterns (wildcard suffix *)
