@@ -248,6 +248,19 @@ resource "aws_ssm_parameter" "business_website_notifications_recipient_email_add
 }
 
 #################
+# joy_alemazung #
+#################
+resource "aws_ssm_parameter" "joy_alemazung_notifications_recipient_email_address" {
+  name        = "/joy-alemazung/notifications/recipient_email_address"
+  description = "Notification recipient email address for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+#################
 # umami         #
 #################
 resource "aws_ssm_parameter" "umami_db_password" {
