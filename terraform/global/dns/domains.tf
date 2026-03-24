@@ -11,6 +11,10 @@ resource "digitalocean_domain" "jakob-lingel-dev" {
   name = "jakob-lingel.dev"
 }
 
+resource "digitalocean_domain" "alemazung_de" {
+  name = "alemazung.de"
+}
+
 resource "digitalocean_domain" "immoly-io" {
   name = "immoly.io"
 }
