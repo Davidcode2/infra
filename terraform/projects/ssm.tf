@@ -235,6 +235,19 @@ resource "aws_ssm_parameter" "mimis_kreativstudio_notifications_recipient_email_
 }
 
 #################
+# business-website #
+#################
+resource "aws_ssm_parameter" "business_website_notifications_recipient_email_address" {
+  name        = "/business-website/notifications/recipient_email_address"
+  description = "Notification recipient email address for business-website"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+#################
 # umami         #
 #################
 resource "aws_ssm_parameter" "umami_db_password" {
