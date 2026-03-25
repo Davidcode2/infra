@@ -178,6 +178,16 @@ resource "aws_ssm_parameter" "joy_alemazung_strapi_transfer_token_salt" {
   }
 }
 
+resource "aws_ssm_parameter" "joy_alemazung_notifications_recipient_email_address" {
+  name        = "/joy_alemazung/notifications/recipient_email_address"
+  description = "Notification recipient email address for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 ######################
 # schluesselmomente  #
 ######################
