@@ -178,6 +178,16 @@ resource "aws_ssm_parameter" "joy_alemazung_strapi_transfer_token_salt" {
   }
 }
 
+resource "aws_ssm_parameter" "joy_alemazung_notifications_recipient_email_address" {
+  name        = "/joy_alemazung/notifications/recipient_email_address"
+  description = "Notification recipient email address for joy_alemazung"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 ######################
 # schluesselmomente  #
 ######################
@@ -240,19 +250,6 @@ resource "aws_ssm_parameter" "mimis_kreativstudio_notifications_recipient_email_
 resource "aws_ssm_parameter" "business_website_notifications_recipient_email_address" {
   name        = "/business-website/notifications/recipient_email_address"
   description = "Notification recipient email address for business-website"
-  type        = "SecureString"
-  value       = "dummy"
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-#################
-# joy_alemazung #
-#################
-resource "aws_ssm_parameter" "joy_alemazung_notifications_recipient_email_address" {
-  name        = "/joy-alemazung/notifications/recipient_email_address"
-  description = "Notification recipient email address for joy_alemazung"
   type        = "SecureString"
   value       = "dummy"
   lifecycle {
