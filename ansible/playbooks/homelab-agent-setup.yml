@@ -1,0 +1,179 @@
+---
+# Playbook to add homelab (Tailscale-connected) devices as k3s agent nodes
+# These nodes are agents only (not servers) and have special taints
+
+# Play 1: Wait for homelab device to be reachable
+- name: Prepare homelab agent nodes
+  hosts: k3s_agents
+  gather_facts: False
+  tasks:
+    - name: Wait for SSH to be available
+      ansible.builtin.wait_for_connection:
+        timeout: 60
+
+# Play 2: Gather facts
+- name: Gather facts on homelab nodes
+  hosts: k3s_agents
+  gather_facts: True
+
+# Play 3: Validate join token is provided
+- name: Validate k3s join token
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Check if k3s_join_token is provided
+      ansible.builtin.fail:
+        msg: "Please provide the k3s join token using -e 'k3s_join_token=YOUR_TOKEN'"
+      when: k3s_join_token is not defined or k3s_join_token | length == 0
+
+# Play 4: Install k3s agent on homelab devices
+- name: Install k3s agent on homelab nodes
+  hosts: k3s_agents
+  become: true
+  vars:
+    k3s_server_url: "https://116.203.111.240:6443"
+    k3s_join_token: "{{ k3s_join_token | default('') }}"
+  handlers:
+    - name: Restart k3s-agent
+      ansible.builtin.systemd:
+        name: k3s-agent
+        state: restarted
+        daemon_reload: yes
+  tasks:
+    - name: Check if k3s-agent is installed and running
+      ansible.builtin.systemd:
+        name: k3s-agent
+      register: k3s_service_status
+      ignore_errors: true
+      changed_when: false
+
+    - name: Set fact for k3s installation status
+      ansible.builtin.set_fact:
+        k3s_installed: "{{ k3s_service_status.status.LoadState | default('not-found') != 'not-found' }}"
+        k3s_running: "{{ k3s_service_status.status.ActiveState | default('unknown') == 'active' }}"
+
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - curl
+          - systemd
+        state: present
+
+    - name: Create k3s config directory
+      ansible.builtin.file:
+        path: /etc/rancher/k3s
+        state: directory
+        mode: '0755'
+
+    - name: Configure k3s agent
+      ansible.builtin.copy:
+        content: |
+          node-name: "{{ node_name }}"
+        dest: /etc/rancher/k3s/config.yaml
+        mode: '0644'
+      notify: Restart k3s-agent
+
+    - name: Install k3s agent
+      ansible.builtin.shell: |
+        curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_EXEC="agent
+          --server {{ k3s_server_url }}
+          --token {{ k3s_join_token }}
+          --node-name {{ node_name }}
+        " sh -
+      args:
+        creates: /etc/systemd/system/k3s-agent.service
+      no_log: true  # Don't log the token
+      when: not k3s_running | bool
+      notify: Restart k3s-agent
+
+    - name: Enable and ensure k3s-agent is running
+      ansible.builtin.systemd:
+        name: k3s-agent
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Wait for k3s agent to be ready
+      ansible.builtin.wait_for:
+        path: /run/k3s/containerd.sock
+        timeout: 600  # 10 minutes for initial image downloads
+      register: wait_result
+      ignore_errors: true
+
+    - name: Check k3s-agent status if timeout occurred
+      ansible.builtin.command: systemctl status k3s-agent --no-pager
+      register: k3s_status
+      when: wait_result is failed
+      changed_when: false
+
+    - name: Display k3s-agent status
+      ansible.builtin.debug:
+        msg: "{{ k3s_status.stdout }}"
+      when: wait_result is failed
+
+    - name: Fail if k3s agent didn't start
+      ansible.builtin.fail:
+        msg: "k3s agent failed to start. Check logs with: journalctl -u k3s-agent -f"
+      when: wait_result is failed
+
+# Play 5: Apply taints and labels from control machine
+- name: Configure node taints and labels
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    kubeconfig_path: "{{ playbook_dir }}/kubeconfig-116.203.111.240.yaml"
+  tasks:
+    - name: Wait for node to appear in cluster
+      ansible.builtin.shell: |
+        kubectl --kubeconfig={{ kubeconfig_path }} get node {{ item }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+      register: node_ready
+      until: node_ready.stdout == "True"
+      retries: 15
+      delay: 10
+      with_items: "{{ groups['k3s_agents'] }}"
+      changed_when: false
+
+    - name: Check if homelab taint exists
+      ansible.builtin.shell: |
+        kubectl --kubeconfig={{ kubeconfig_path }} get node {{ item }} -o jsonpath='{.spec.taints[?(@.key=="dedicated")].value}' 2>/dev/null || echo ""
+      register: taint_check
+      changed_when: false
+      with_items: "{{ groups['k3s_agents'] }}"
+
+    - name: Apply homelab taint to prevent regular workloads
+      ansible.builtin.shell: |
+        kubectl --kubeconfig={{ kubeconfig_path }} taint nodes {{ item.item }} dedicated=homelab:NoSchedule --overwrite
+      register: taint_result
+      changed_when: "'tainted' in taint_result.stdout"
+      when: "item.stdout != 'homelab'"
+      with_items: "{{ taint_check.results }}"
+
+    - name: Check if homelab label exists
+      ansible.builtin.shell: |
+        kubectl --kubeconfig={{ kubeconfig_path }} get node {{ item }} -o jsonpath='{.metadata.labels.node-type}' 2>/dev/null || echo ""
+      register: label_check
+      changed_when: false
+      with_items: "{{ groups['k3s_agents'] }}"
+
+    - name: Label node as homelab
+      ansible.builtin.shell: |
+        kubectl --kubeconfig={{ kubeconfig_path }} label nodes {{ item.item }} node-type=homelab --overwrite
+      register: label_result
+      changed_when: "'labeled' in label_result.stdout"
+      when: "item.stdout != 'homelab'"
+      with_items: "{{ label_check.results }}"
+
+    - name: Display node status
+      ansible.builtin.shell: |
+        kubectl --kubeconfig={{ kubeconfig_path }} get node {{ item }} -o wide
+      with_items: "{{ groups['k3s_agents'] }}"
+      changed_when: false
+      register: node_status
+
+    - name: Show node details
+      ansible.builtin.debug:
+        msg: "{{ item.stdout }}"
+      with_items: "{{ node_status.results }}"
