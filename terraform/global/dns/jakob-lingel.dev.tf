@@ -180,6 +180,14 @@ resource "digitalocean_record" "jakob_lingel_dev_www_telemetry" {
   value  = "telemetry.jakob-lingel.dev."
 }
 
+# paperless CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_paperless" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "paperless"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
 
 # NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {

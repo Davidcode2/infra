@@ -27,6 +27,7 @@ locals {
     message_router      = "message-router"
     mimis_kreativstudio = "mimis-kreativstudio"
     business_website    = "business-website"
+    paperless           = "paperless"
   }
 
   # ci-role patterns (wildcard suffix *)
