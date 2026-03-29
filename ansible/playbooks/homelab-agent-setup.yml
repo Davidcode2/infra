@@ -16,6 +16,26 @@
   hosts: k3s_agents
   gather_facts: True
 
+# Play 2b: Get Tailscale IP for Flannel
+- name: Get Tailscale IP for Flannel networking
+  hosts: k3s_agents
+  gather_facts: False
+  tasks:
+    - name: Get Tailscale IP address from tailscale0 interface
+      ansible.builtin.shell: |
+        ip addr show tailscale0 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1
+      register: tailscale_ip_cmd
+      changed_when: false
+      ignore_errors: true
+
+    - name: Use ansible_host as Tailscale IP if interface not found
+      ansible.builtin.set_fact:
+        tailscale_node_ip: "{{ tailscale_ip_cmd.stdout | default(ansible_host, true) }}"
+
+    - name: Display Tailscale IP
+      ansible.builtin.debug:
+        msg: "Using Tailscale IP: {{ tailscale_node_ip }} for Flannel networking"
+
 # Play 3: Validate join token is provided
 - name: Validate k3s join token
   hosts: localhost
@@ -74,18 +94,54 @@
         mode: '0644'
       notify: Restart k3s-agent
 
-    - name: Install k3s agent
+    - name: Uninstall existing k3s agent for reconfiguration
+      ansible.builtin.shell: |
+        /usr/local/bin/k3s-agent-uninstall.sh || true
+      when:
+        - k3s_running | bool
+        - tailscale_node_ip is defined
+      ignore_errors: true
+
+    - name: Clean up k3s agent data for fresh start
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s
+        state: absent
+      when:
+        - k3s_running | bool
+        - tailscale_node_ip is defined
+
+    - name: Install k3s agent with Tailscale IP
       ansible.builtin.shell: |
         curl -sfL https://get.k3s.io | \
         INSTALL_K3S_EXEC="agent
           --server {{ k3s_server_url }}
           --token {{ k3s_join_token }}
           --node-name {{ node_name }}
+          --node-ip {{ tailscale_node_ip }}
+          --flannel-iface tailscale0
         " sh -
       args:
         creates: /etc/systemd/system/k3s-agent.service
       no_log: true  # Don't log the token
       when: not k3s_running | bool
+      notify: Restart k3s-agent
+
+    - name: Force reinstall k3s agent for Tailscale reconfiguration
+      ansible.builtin.shell: |
+        /usr/local/bin/k3s-agent-uninstall.sh || true
+        rm -rf /var/lib/rancher/k3s
+        curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_EXEC="agent
+          --server {{ k3s_server_url }}
+          --token {{ k3s_join_token }}
+          --node-name {{ node_name }}
+          --node-ip {{ tailscale_node_ip }}
+          --flannel-iface tailscale0
+        " sh -
+      no_log: true  # Don't log the token
+      when:
+        - k3s_running | bool
+        - tailscale_node_ip is defined
       notify: Restart k3s-agent
 
     - name: Enable and ensure k3s-agent is running
@@ -97,7 +153,7 @@
 
     - name: Wait for k3s agent to be ready
       ansible.builtin.wait_for:
-        path: /run/k3s/containerd.sock
+        path: /run/k3s/containerd/containerd.sock
         timeout: 600  # 10 minutes for initial image downloads
       register: wait_result
       ignore_errors: true
