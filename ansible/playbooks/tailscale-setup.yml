@@ -1,0 +1,74 @@
+---
+# tailscale-setup.yml
+# Idempotent Tailscale installation for infrastructure nodes
+# Uses official install.sh script
+# Can be run multiple times safely
+
+- name: Setup Tailscale on infrastructure nodes
+  hosts: tailscale_nodes
+  become: true
+  vars:
+    tailscale_auth_key: "{{ tailscale_auth_key | default('') }}"
+    
+  pre_tasks:
+    - name: Validate auth key is provided
+      ansible.builtin.fail:
+        msg: "Please provide tailscale_auth_key variable using -e 'tailscale_auth_key=YOUR_KEY'"
+      when: tailscale_auth_key | length == 0
+      run_once: true
+    
+    - name: Wait for SSH connection
+      ansible.builtin.wait_for_connection:
+        timeout: 60
+
+  tasks:
+    # Phase 1: Check current state
+    - name: Check if Tailscale is installed
+      ansible.builtin.command: which tailscale
+      register: tailscale_binary
+      ignore_errors: true
+      changed_when: false
+    
+    - name: Check Tailscale connection status
+      ansible.builtin.command: tailscale status
+      register: tailscale_status
+      ignore_errors: true
+      changed_when: false
+      when: tailscale_binary.rc == 0
+    
+    # Phase 2: Install Tailscale (if not present)
+    - name: Install Tailscale using official install script
+      ansible.builtin.shell: |
+        curl -fsSL https://tailscale.com/install.sh | sh
+      args:
+        creates: /usr/bin/tailscale
+      when: tailscale_binary.rc != 0
+    
+    # Phase 3: Authenticate Tailscale (if not already connected)
+    - name: Authenticate Tailscale
+      ansible.builtin.command: >
+        tailscale up
+        --authkey={{ tailscale_auth_key }}
+        --hostname={{ inventory_hostname }}
+      no_log: true
+      when: tailscale_binary.rc != 0 or tailscale_status.rc|default(1) != 0
+      register: tailscale_auth_result
+    
+    # Phase 4: Verify Tailscale is connected
+    - name: Verify Tailscale is connected
+      ansible.builtin.command: tailscale status
+      register: final_status
+      changed_when: false
+    
+    - name: Display Tailscale status
+      ansible.builtin.debug:
+        var: final_status.stdout_lines
+    
+    - name: Get Tailscale IP
+      ansible.builtin.command: tailscale ip -4
+      register: tailscale_ip
+      changed_when: false
+    
+    - name: Display Tailscale IP
+      ansible.builtin.debug:
+        msg: "Node {{ inventory_hostname }} has Tailscale IP: {{ tailscale_ip.stdout }}"

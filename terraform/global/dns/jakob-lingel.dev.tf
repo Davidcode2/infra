@@ -185,8 +185,8 @@ resource "digitalocean_record" "jakob_lingel_dev_paperless" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "paperless"
-  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
-  ttl    = 1800
+  value  = "acer-arch.tailb781ce.ts.net."
+  ttl    = 300
 }
 
 # NS records
