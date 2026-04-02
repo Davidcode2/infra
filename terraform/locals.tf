@@ -28,6 +28,7 @@ locals {
     mimis_kreativstudio = "mimis-kreativstudio"
     business_website    = "business-website"
     paperless           = "paperless"
+    vogthof             = "vogthof"
   }
 
   # ci-role patterns (wildcard suffix *)

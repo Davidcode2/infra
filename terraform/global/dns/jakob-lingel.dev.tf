@@ -172,6 +172,15 @@ resource "digitalocean_record" "jakob_lingel_dev_notifications" {
   ttl    = 1800
 }
 
+# vogthof CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_vogthof" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "vogthof"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # www.telemetry CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_www_telemetry" {
   domain = digitalocean_domain.jakob-lingel-dev.name
