@@ -13,6 +13,11 @@ output "server_name_to_id" {
   value = { for s in hcloud_server.k8s_node : s.name => s.id }
 }
 
+# Expose worker node IDs
+output "worker_ids" {
+  value = [for s in hcloud_server.k8s_worker : s.id]
+}
+
 # This resource generates the inventory.ini file
 resource "local_file" "ansible_inventory" {
   # The content comes from the template file
@@ -20,6 +25,13 @@ resource "local_file" "ansible_inventory" {
     # Pass Terraform data into the template
     masters = [
       for s in hcloud_server.k8s_node : {
+        name = s.name
+        ipv4 = s.ipv4_address
+        id   = s.id
+      }
+    ]
+    workers = [
+      for s in hcloud_server.k8s_worker : {
         name = s.name
         ipv4 = s.ipv4_address
         id   = s.id
