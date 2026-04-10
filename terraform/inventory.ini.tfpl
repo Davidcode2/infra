@@ -21,3 +21,9 @@ ${node.name} ansible_host=${node.ipv4} hcloud_id=${node.id}
 [k3s_masters:children]
 k3s_master_init
 k3s_masters_join
+
+# This group contains worker nodes
+[k8s_workers]
+%{ for node in workers ~}
+${node.name} ansible_host=${node.ipv4} hcloud_id=${node.id}
+%{ endfor ~}

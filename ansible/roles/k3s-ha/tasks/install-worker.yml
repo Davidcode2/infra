@@ -1,0 +1,26 @@
+---
+# Install k3s agent on worker nodes
+# Worker nodes do not run the control plane, only kubelet and container runtime
+
+- name: 1. Install k3s agent on worker node
+  ansible.builtin.shell: |
+    curl -sfL https://get.k3s.io | \
+    INSTALL_K3S_EXEC="
+      agent
+      --server https://{{ k3s_init_node_ip }}:6443
+      --token {{ hostvars[groups['k3s_master_init'][0]]['k3s_token'] }}
+      --kubelet-arg cloud-provider=external
+      --kubelet-arg provider-id=hcloud://{{ hcloud_id }}
+    " sh
+  args:
+    creates: /etc/systemd/system/k3s-agent.service
+  environment:
+    K3S_URL: "https://{{ k3s_init_node_ip }}:6443"
+    K3S_TOKEN: "{{ hostvars[groups['k3s_master_init'][0]]['k3s_token'] }}"
+
+- name: 2. Ensure k3s-agent service is enabled and started
+  ansible.builtin.systemd:
+    name: k3s-agent
+    state: started
+    enabled: yes
+  become: true

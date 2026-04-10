@@ -55,13 +55,7 @@ module "projects" {
   hetzner_cloud_server_1_deployment_private_ssh_key = tls_private_key.hetzner_private_key.private_key_pem
 }
 
-# compute
-resource "hcloud_server" "hetzner_ubuntu-4gb-nbg1-1" {
-  name        = "ubuntu-4gb-nbg1-1"
-  image       = "ubuntu-24.04"
-  server_type = "cx23"
-  location    = "nbg1"
-}
+# compute - legacy server removed (destroyed and recreated as k8s-worker-1)
 
 resource "hcloud_ssh_key" "hetzner_ssh_key" {
   name       = "hetzner-1"
@@ -106,4 +100,24 @@ resource "hcloud_server" "k8s_node" {
   network {
     network_id = hcloud_network.k8s_private_net.id
   }
+}
+
+# Worker nodes (separate from masters for flexibility)
+resource "hcloud_server" "k8s_worker" {
+  count       = 1 # Can be increased for more workers
+  name        = "k8s-worker-${count.index + 1}"
+  image       = "ubuntu-24.04"
+  server_type = "cx23"
+  location    = "nbg1"
+  ssh_keys    = [hcloud_ssh_key.hetzner_ssh_key.id]
+
+  # Attach each server to the private network
+  network {
+    network_id = hcloud_network.k8s_private_net.id
+  }
+
+  # Ensure subnet is created before server to avoid race conditions
+  depends_on = [
+    hcloud_network_subnet.k8s_private_subnet
+  ]
 }
