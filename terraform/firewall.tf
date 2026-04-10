@@ -49,6 +49,28 @@ resource "hcloud_firewall" "k8s_cluster" {
     ]
   }
 
+  # Kubernetes NodePort range (for load balancer health checks)
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "30000-32767"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
+  # Flannel VXLAN (overlay network traffic between nodes)
+  rule {
+    direction = "in"
+    protocol  = "udp"
+    port      = "8472"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
   # Allow all traffic within the private network (for k3s cluster communication)
   rule {
     direction = "in"
