@@ -29,6 +29,7 @@ locals {
     business_website    = "business-website"
     paperless           = "paperless"
     vogthof             = "vogthof"
+    maas_bueromoebel    = "maas-bueromoebel"
   }
 
   # ci-role patterns (wildcard suffix *)

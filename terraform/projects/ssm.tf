@@ -281,3 +281,16 @@ resource "aws_ssm_parameter" "umami_app_secret" {
     ignore_changes = [value]
   }
 }
+
+#################
+# maas-bueromoebel #
+#################
+resource "aws_ssm_parameter" "maas_bueromoebel_notifications_recipient_email_address" {
+  name        = "/maas-bueromoebel/notifications/recipient_email_address"
+  description = "Notification recipient email address for maas-bueromoebel"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
