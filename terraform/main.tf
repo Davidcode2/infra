@@ -96,9 +96,10 @@ resource "hcloud_server" "k8s_node" {
   location    = "nbg1"
   ssh_keys    = [hcloud_ssh_key.hetzner_ssh_key.id]
 
-  # Attach each server to the private network
+  # Attach each server to the private network with explicit IPs
   network {
     network_id = hcloud_network.k8s_private_net.id
+    ip         = "10.0.1.${count.index + 1}"
   }
 }
 
@@ -111,9 +112,11 @@ resource "hcloud_server" "k8s_worker" {
   location    = "nbg1"
   ssh_keys    = [hcloud_ssh_key.hetzner_ssh_key.id]
 
-  # Attach each server to the private network
+  # Attach each server to the private network with explicit IP
+  # Workers start at 10.0.1.10 to leave room for more master nodes
   network {
     network_id = hcloud_network.k8s_private_net.id
+    ip         = "10.0.1.${10 + count.index}"
   }
 
   # Ensure subnet is created before server to avoid race conditions
