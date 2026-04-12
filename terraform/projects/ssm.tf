@@ -294,3 +294,36 @@ resource "aws_ssm_parameter" "maas_bueromoebel_notifications_recipient_email_add
     ignore_changes = [value]
   }
 }
+
+#################
+# gmymf-medusa  #
+#################
+resource "aws_ssm_parameter" "gmymf_medusa_jwt_secret" {
+  name        = "/gmymf-medusa/jwt/secret"
+  description = "JWT secret for gmymf-medusa"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "gmymf_medusa_cookie_secret" {
+  name        = "/gmymf-medusa/cookie/secret"
+  description = "Cookie secret for gmymf-medusa"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "gmymf_medusa_db_password" {
+  name        = "/gmymf-medusa/db/password"
+  description = "Database password for gmymf-medusa"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
