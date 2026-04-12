@@ -216,6 +216,15 @@ resource "digitalocean_record" "jakob_lingel_dev_gmymf_medusa" {
   ttl    = 1800
 }
 
+# gmymf-storefront CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_gmymf_storefront" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "gmymf"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name
