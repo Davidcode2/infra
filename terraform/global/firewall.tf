@@ -22,19 +22,19 @@ resource "digitalocean_firewall" "teachme_firewall" {
   }
 
   outbound_rule {
-    protocol            = "icmp"
+    protocol              = "icmp"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 
   outbound_rule {
-    protocol            = "tcp"
-    port_range          = "0"
+    protocol              = "tcp"
+    port_range            = "0"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 
   outbound_rule {
-    protocol            = "udp"
-    port_range          = "0"
+    protocol              = "udp"
+    port_range            = "0"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 }
