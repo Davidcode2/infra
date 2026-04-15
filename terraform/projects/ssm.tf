@@ -327,3 +327,16 @@ resource "aws_ssm_parameter" "gmymf_medusa_db_password" {
     ignore_changes = [value]
   }
 }
+
+#################
+# gmymf-storefront  #
+#################
+resource "aws_ssm_parameter" "gmymf_storefront_medusa_publishable_key" {
+  name        = "/gmymf-storefront/medusa/publishable_key"
+  description = "Medusa publishable API key for gmymf-storefront"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
