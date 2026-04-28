@@ -225,6 +225,23 @@ resource "digitalocean_record" "jakob_lingel_dev_gmymf_storefront" {
   ttl    = 1800
 }
 
+# Auth subdomain (migrated from teachly.store)
+resource "digitalocean_record" "jakob_lingel_dev_auth_A" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "A"
+  name   = "auth"
+  value  = "49.13.45.106"
+  ttl    = 3600
+}
+
+resource "digitalocean_record" "jakob_lingel_dev_www_auth_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.auth"
+  value  = "auth.jakob-lingel.dev."
+  ttl    = 43200
+}
+
 # NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name

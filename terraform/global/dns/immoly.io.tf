@@ -1,11 +1,11 @@
 resource "digitalocean_record" "immoly_io_www_A" {
   domain = digitalocean_domain.immoly-io.name
-  type = "A"
-  name = "www"
+  type   = "A"
+  name   = "www"
   value  = "49.13.45.106"
   #value = var.hetzner_cloud_server_1_ipv4
   #value = hcloud_load_balancer.k8s_lb.ipv4
-  ttl    = 1800
+  ttl = 1800
 }
 
 resource "digitalocean_record" "immoly_io_A" {
@@ -15,7 +15,7 @@ resource "digitalocean_record" "immoly_io_A" {
   value  = "49.13.45.106"
   #value = var.hetzner_cloud_server_1_ipv4
   #value = hcloud_load_balancer.k8s_lb.ipv4
-  ttl    = 1800
+  ttl = 1800
 }
 
 # blog CNAME record
