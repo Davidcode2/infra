@@ -26,3 +26,7 @@ resource "digitalocean_domain" "schluesselmomente_freiburg_de" {
 resource "digitalocean_domain" "mimis_kreativstudio_de" {
   name = "mimis-kreativstudio.de"
 }
+
+resource "digitalocean_domain" "gmymf_com" {
+  name = "gmymf.com"
+}

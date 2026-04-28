@@ -31,6 +31,7 @@ locals {
     vogthof             = "vogthof"
     maas_bueromoebel    = "maas-bueromoebel"
     gmymf_medusa        = "gmymf-medusa"
+    gmymf_storefront    = "gmymf-storefront"
   }
 
   # ci-role patterns (wildcard suffix *)
