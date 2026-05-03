@@ -79,6 +79,39 @@ resource "aws_ssm_parameter" "immoly_db_name" {
 }
 
 #################
+# schreinerei   #
+#################
+resource "aws_ssm_parameter" "schreinerei_db_user" {
+  name        = "/schreinerei/db/user"
+  description = "Database user for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_db_password" {
+  name        = "/schreinerei/db/password"
+  description = "Database password for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_db_name" {
+  name        = "/schreinerei/db/name"
+  description = "Database name for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+#################
 # joy_alemazung #
 #################
 resource "aws_ssm_parameter" "joy_alemazung_strapi_api_url" {

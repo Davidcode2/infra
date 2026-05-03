@@ -207,6 +207,15 @@ resource "digitalocean_record" "jakob_lingel_dev_paperless" {
   ttl    = 300
 }
 
+# schreinerei CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_schreinerei" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "schreinerei"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # gmymf-medusa CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_gmymf_medusa" {
   domain = digitalocean_domain.jakob-lingel-dev.name
@@ -266,4 +275,3 @@ resource "digitalocean_record" "jakob_lingel_dev_ns3" {
   value  = "ns3.digitalocean.com."
   ttl    = 1800
 }
-
