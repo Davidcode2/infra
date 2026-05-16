@@ -111,6 +111,46 @@ resource "aws_ssm_parameter" "schreinerei_db_name" {
   }
 }
 
+resource "aws_ssm_parameter" "schreinerei_keycloak_admin_client_id" {
+  name        = "/schreinerei/keycloak/admin_client_id"
+  description = "Keycloak admin client ID for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_keycloak_admin_client_secret" {
+  name        = "/schreinerei/keycloak/admin_client_secret"
+  description = "Keycloak admin client secret for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_keycloak_admin_realm" {
+  name        = "/schreinerei/keycloak/admin_realm"
+  description = "Keycloak admin realm for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_mollie_api_key" {
+  name        = "/schreinerei/mollie/api_key"
+  description = "Mollie API key for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 #################
 # joy_alemazung #
 #################
