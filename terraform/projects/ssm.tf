@@ -79,6 +79,79 @@ resource "aws_ssm_parameter" "immoly_db_name" {
 }
 
 #################
+# schreinerei   #
+#################
+resource "aws_ssm_parameter" "schreinerei_db_user" {
+  name        = "/schreinerei/db/user"
+  description = "Database user for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_db_password" {
+  name        = "/schreinerei/db/password"
+  description = "Database password for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_db_name" {
+  name        = "/schreinerei/db/name"
+  description = "Database name for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_keycloak_admin_client_id" {
+  name        = "/schreinerei/keycloak/admin_client_id"
+  description = "Keycloak admin client ID for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_keycloak_admin_client_secret" {
+  name        = "/schreinerei/keycloak/admin_client_secret"
+  description = "Keycloak admin client secret for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_keycloak_admin_realm" {
+  name        = "/schreinerei/keycloak/admin_realm"
+  description = "Keycloak admin realm for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "schreinerei_mollie_api_key" {
+  name        = "/schreinerei/mollie/api_key"
+  description = "Mollie API key for schreinerei"
+  type        = "SecureString"
+  value       = "dummy"
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+#################
 # joy_alemazung #
 #################
 resource "aws_ssm_parameter" "joy_alemazung_strapi_api_url" {

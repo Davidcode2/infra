@@ -18,6 +18,7 @@ locals {
   # - ci-role uses wildcard suffix (*)
   # - terraform-ci-role and ESO use path prefix (/*)
   app_patterns = {
+    schreinerei         = "schreinerei"
     immoly              = "immoly"
     joy_alemazung       = "joy_alemazung"
     schluesselmomente   = "schluesselmomente"
@@ -59,4 +60,3 @@ locals {
     for app_name in values(local.app_patterns) : "arn:aws:ssm:${local.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${app_name}/*"
   ]
 }
-

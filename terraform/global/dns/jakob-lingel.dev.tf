@@ -207,6 +207,24 @@ resource "digitalocean_record" "jakob_lingel_dev_paperless" {
   ttl    = 300
 }
 
+# schreinerei CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_schreinerei" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "schreinerei"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# schreinerei-app CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_schreinerei_app" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "schreinerei-app"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # gmymf-medusa CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_gmymf_medusa" {
   domain = digitalocean_domain.jakob-lingel-dev.name
@@ -223,6 +241,23 @@ resource "digitalocean_record" "jakob_lingel_dev_gmymf_storefront" {
   name   = "gmymf"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
   ttl    = 1800
+}
+
+# Auth subdomain (migrated from teachly.store)
+resource "digitalocean_record" "jakob_lingel_dev_auth_A" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "A"
+  name   = "auth"
+  value  = "49.13.45.106"
+  ttl    = 3600
+}
+
+resource "digitalocean_record" "jakob_lingel_dev_www_auth_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.auth"
+  value  = "auth.jakob-lingel.dev."
+  ttl    = 43200
 }
 
 # NS records
@@ -249,4 +284,3 @@ resource "digitalocean_record" "jakob_lingel_dev_ns3" {
   value  = "ns3.digitalocean.com."
   ttl    = 1800
 }
-

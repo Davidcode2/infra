@@ -1,11 +1,11 @@
 # Points to nginx ingress controller LoadBalancer
 resource "digitalocean_record" "alemazung_de_www_A" {
   domain = digitalocean_domain.alemazung_de.name
-  type = "A"
-  name = "www"
+  type   = "A"
+  name   = "www"
   #value = var.hetzner_cloud_server_1_ipv4
-  value  = "49.13.45.106"
-  ttl    = 1800
+  value = "49.13.45.106"
+  ttl   = 1800
 }
 
 # Points to nginx ingress controller LoadBalancer
@@ -15,7 +15,7 @@ resource "digitalocean_record" "alemazung_de_A" {
   name   = "@"
   value  = "49.13.45.106"
   #value  = var.hetzner_cloud_server_1_ipv4
-  ttl    = 1800
+  ttl = 1800
 }
 
 # NS records
