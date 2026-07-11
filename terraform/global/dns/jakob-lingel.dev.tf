@@ -225,6 +225,15 @@ resource "digitalocean_record" "jakob_lingel_dev_schreinerei_app" {
   ttl    = 1800
 }
 
+# schreinerei-app www CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_www_schreinerei_app" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.schreinerei-app"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # gmymf-medusa CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_gmymf_medusa" {
   domain = digitalocean_domain.jakob-lingel-dev.name
@@ -239,6 +248,24 @@ resource "digitalocean_record" "jakob_lingel_dev_gmymf_storefront" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "gmymf"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# immo CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_immo" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "immo"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# immo www CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_www_immo" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "www.immo"
   value  = "${digitalocean_domain.jakob-lingel-dev.name}."
   ttl    = 1800
 }
