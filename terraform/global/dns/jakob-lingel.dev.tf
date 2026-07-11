@@ -226,7 +226,7 @@ resource "digitalocean_record" "jakob_lingel_dev_schreinerei_app" {
 }
 
 # schreinerei-app www CNAME record
-resource "digitalocean_record" "jakob_lingel_dev_schreinerei_app" {
+resource "digitalocean_record" "jakob_lingel_dev_www_schreinerei_app" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "www.schreinerei-app"
@@ -262,7 +262,7 @@ resource "digitalocean_record" "jakob_lingel_dev_immo" {
 }
 
 # immo www CNAME record
-resource "digitalocean_record" "jakob_lingel_dev_immo" {
+resource "digitalocean_record" "jakob_lingel_dev_www_immo" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "CNAME"
   name   = "www.immo"
