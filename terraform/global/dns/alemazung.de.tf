@@ -18,6 +18,26 @@ resource "digitalocean_record" "alemazung_de_A" {
   ttl = 1800
 }
 
+# Points to nginx ingress controller LoadBalancer
+resource "digitalocean_record" "alemazung_de_api_A" {
+  domain = digitalocean_domain.alemazung_de.name
+  type   = "A"
+  name   = "api"
+  value  = "49.13.45.106"
+  #value  = var.hetzner_cloud_server_1_ipv4
+  ttl = 1800
+}
+
+# Points to nginx ingress controller LoadBalancer
+resource "digitalocean_record" "alemazung_de_www_api_A" {
+  domain = digitalocean_domain.alemazung_de.name
+  type   = "A"
+  name   = "www.api"
+  value  = "49.13.45.106"
+  #value  = var.hetzner_cloud_server_1_ipv4
+  ttl = 1800
+}
+
 # NS records
 resource "digitalocean_record" "alemazung_de_ns1" {
   domain = digitalocean_domain.alemazung_de.name
