@@ -76,7 +76,7 @@ infra/
 Managed via Terraform in `global/dns/`:
 - `jakob-lingel.dev` and subdomains
 - `schluesselmomente-freiburg.de`
-- `immoly.io`
+- `immo.jakob-lingel.dev`
 - `mimis-kreativstudio.de`
 
 ### Security
