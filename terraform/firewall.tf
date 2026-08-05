@@ -209,6 +209,53 @@ resource "hcloud_firewall" "legacy_vm" {
   }
 }
 
+# Firewall for bot node (OpenClaw / MoltBot)
+# Minimal inbound surface: SSH only. No public web UI/API.
+resource "hcloud_firewall" "bot_node" {
+  name = "bot-node-firewall"
+
+  # SSH access from anywhere (restrict to your admin IP in a follow-up if desired)
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "22"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
+  # Allow all outbound traffic
+  rule {
+    direction = "out"
+    protocol  = "tcp"
+    port      = "any"
+    destination_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
+  rule {
+    direction = "out"
+    protocol  = "udp"
+    port      = "any"
+    destination_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
+  rule {
+    direction = "out"
+    protocol  = "icmp"
+    destination_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+}
+
 # Attach firewall to k8s cluster nodes (masters + workers)
 resource "hcloud_firewall_attachment" "k8s_cluster" {
   firewall_id = hcloud_firewall.k8s_cluster.id
@@ -216,4 +263,10 @@ resource "hcloud_firewall_attachment" "k8s_cluster" {
     [for server in hcloud_server.k8s_node : server.id],
     [for server in hcloud_server.k8s_worker : server.id]
   )
+}
+
+# Attach firewall to bot node
+resource "hcloud_firewall_attachment" "bot_node" {
+  firewall_id = hcloud_firewall.bot_node.id
+  server_ids  = [for server in hcloud_server.bot_node : server.id]
 }
