@@ -88,6 +88,38 @@ resource "hcloud_network_subnet" "k8s_private_subnet" {
   ip_range     = "10.0.1.0/24"
 }
 
+# Bot node private network (isolated from the Kubernetes cluster)
+resource "hcloud_network" "bot_private_net" {
+  name     = "bot-private-net"
+  ip_range = "10.1.0.0/16"
+}
+
+resource "hcloud_network_subnet" "bot_private_subnet" {
+  network_id   = hcloud_network.bot_private_net.id
+  type         = "cloud"
+  network_zone = "eu-central"
+  ip_range     = "10.1.1.0/24"
+}
+
+resource "hcloud_server" "bot_node" {
+  count       = 1
+  name        = "bot-node-${count.index + 1}"
+  image       = "ubuntu-24.04"
+  server_type = "cx23"
+  location    = "nbg1"
+  ssh_keys    = [hcloud_ssh_key.hetzner_ssh_key.id]
+
+  # Attach each server to the bot private network with explicit IPs
+  network {
+    network_id = hcloud_network.bot_private_net.id
+    ip         = "10.1.1.${count.index + 1}"
+  }
+
+  depends_on = [
+    hcloud_network_subnet.bot_private_subnet
+  ]
+}
+
 resource "hcloud_server" "k8s_node" {
   count       = 3 # Create three identical nodes
   name        = "k8s-node-${count.index + 1}"
@@ -100,6 +132,23 @@ resource "hcloud_server" "k8s_node" {
   network {
     network_id = hcloud_network.k8s_private_net.id
     ip         = "10.0.1.${count.index + 1}"
+  }
+
+  # Provider does not persist all metadata for these imported servers,
+  # so ignore the drift to avoid unwanted updates or recreation.
+  lifecycle {
+    ignore_changes = [
+      location,
+      datacenter,
+      labels,
+      placement_group_id,
+      ssh_keys,
+      allow_deprecated_images,
+      ignore_remote_firewall_ids,
+      keep_disk,
+      shutdown_before_deletion,
+      network,
+    ]
   }
 }
 
@@ -123,4 +172,21 @@ resource "hcloud_server" "k8s_worker" {
   depends_on = [
     hcloud_network_subnet.k8s_private_subnet
   ]
+
+  # Provider does not persist all metadata for this imported server,
+  # so ignore the drift to avoid unwanted updates or recreation.
+  lifecycle {
+    ignore_changes = [
+      location,
+      datacenter,
+      labels,
+      placement_group_id,
+      ssh_keys,
+      allow_deprecated_images,
+      ignore_remote_firewall_ids,
+      keep_disk,
+      shutdown_before_deletion,
+      network,
+    ]
+  }
 }
