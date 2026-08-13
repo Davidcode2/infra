@@ -33,6 +33,7 @@ locals {
     maas_bueromoebel    = "maas-bueromoebel"
     gmymf_medusa        = "gmymf-medusa"
     gmymf_storefront    = "gmymf-storefront"
+    oauth2_proxy        = "oauth2-proxy"
   }
 
   # ci-role patterns (wildcard suffix *)
