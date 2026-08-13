@@ -287,6 +287,24 @@ resource "digitalocean_record" "jakob_lingel_dev_www_auth_CNAME" {
   ttl    = 43200
 }
 
+# tango CNAME record for myTNG alternative frontend
+resource "digitalocean_record" "jakob_lingel_dev_tango" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "tango"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
+# oauth2 CNAME record 
+resource "digitalocean_record" "jakob_lingel_dev_oauth" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "oauth2"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # NS records
 resource "digitalocean_record" "jakob_lingel_dev_ns1" {
   domain = digitalocean_domain.jakob-lingel-dev.name
@@ -309,14 +327,5 @@ resource "digitalocean_record" "jakob_lingel_dev_ns3" {
   type   = "NS"
   name   = "@"
   value  = "ns3.digitalocean.com."
-  ttl    = 1800
-}
-
-# tango CNAME record for myTNG alternative frontend
-resource "digitalocean_record" "jakob_lingel_dev_tango" {
-  domain = digitalocean_domain.jakob-lingel-dev.name
-  type   = "CNAME"
-  name   = "tango"
-  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
   ttl    = 1800
 }

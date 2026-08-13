@@ -104,7 +104,7 @@ resource "hcloud_network_subnet" "bot_private_subnet" {
 resource "hcloud_server" "bot_node" {
   count       = 1
   name        = "bot-node-${count.index + 1}"
-  image       = "ubuntu-24.04"
+  image       = "ubuntu-26.04"
   server_type = "cx23"
   location    = "nbg1"
   ssh_keys    = [hcloud_ssh_key.hetzner_ssh_key.id]
