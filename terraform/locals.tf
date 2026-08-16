@@ -34,6 +34,7 @@ locals {
     gmymf_medusa        = "gmymf-medusa"
     gmymf_storefront    = "gmymf-storefront"
     oauth2_proxy        = "oauth2-proxy"
+    argocd              = "argocd"
   }
 
   # ci-role patterns (wildcard suffix *)

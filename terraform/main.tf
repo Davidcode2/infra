@@ -118,6 +118,23 @@ resource "hcloud_server" "bot_node" {
   depends_on = [
     hcloud_network_subnet.bot_private_subnet
   ]
+
+  # Provider does not persist all metadata for this imported server,
+  # so ignore the drift to avoid unwanted updates or recreation.
+  lifecycle {
+    ignore_changes = [
+      location,
+      datacenter,
+      labels,
+      placement_group_id,
+      ssh_keys,
+      allow_deprecated_images,
+      ignore_remote_firewall_ids,
+      keep_disk,
+      shutdown_before_deletion,
+      network,
+    ]
+  }
 }
 
 resource "hcloud_server" "k8s_node" {
