@@ -28,6 +28,15 @@ resource "digitalocean_record" "jakob_lingel_dev_portfolio_A" {
   ttl = 1800
 }
 
+# Vacation Studio CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_travel_CNAME" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "travel"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # immoly CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_immoly_CNAME" {
   domain = digitalocean_domain.jakob-lingel-dev.name
