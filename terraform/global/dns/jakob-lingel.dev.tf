@@ -68,7 +68,7 @@ resource "digitalocean_record" "jakob_lingel_dev_immoly_google_verification" {
 resource "digitalocean_record" "jakob_lingel_dev_immo_google_verification" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "TXT"
-  name   = "immo"
+  name   = "@"
   value  = "google-site-verification=UQCwC9MRY8JE8wwIVe471tqhnMRtOCnz8q9OngrWTgY"
   ttl    = 1800
 }
@@ -77,7 +77,7 @@ resource "digitalocean_record" "jakob_lingel_dev_immo_google_verification" {
 resource "digitalocean_record" "jakob_lingel_dev_schreinerei_app_google_verification" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "TXT"
-  name   = "schreinerei-app"
+  name   = "@"
   value  = "google-site-verification=ePpGyJ5gHUdq5uQ-mAkk4TGZQpSPq1G5B3vwptYHFKc"
   ttl    = 1800
 }
