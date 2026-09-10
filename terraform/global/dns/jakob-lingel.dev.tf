@@ -73,6 +73,15 @@ resource "digitalocean_record" "jakob_lingel_dev_immo_google_verification" {
   ttl    = 1800
 }
 
+# google search ownership verification TXT record for portfolio.jakob-lingel.dev
+resource "digitalocean_record" "jakob_lingel_dev_portfolio_google_verification" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "TXT"
+  name   = "@"
+  value  = "google-site-verification=9mS_je2OJqOW8vlDGA6jXDVgi79c4rpxNg1t5u2VRN8"
+  ttl    = 1800
+}
+
 # google search ownership verification TXT record for schreinerei-app.jakob-lingel.dev
 resource "digitalocean_record" "jakob_lingel_dev_schreinerei_app_google_verification" {
   domain = digitalocean_domain.jakob-lingel-dev.name
