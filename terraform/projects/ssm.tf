@@ -261,6 +261,20 @@ resource "aws_ssm_parameter" "joy_alemazung_notifications_recipient_email_addres
   }
 }
 
+############
+#  smiles  #
+############
+resource "aws_ssm_parameter" "smiles_notifications_recipient_email_address" {
+  name        = "/smiles/notifications/recipient_email_address"
+  description = "Waitlist recipient email address for Smiles"
+  type        = "SecureString"
+  value       = "dummy"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 ######################
 # schluesselmomente  #
 ######################
