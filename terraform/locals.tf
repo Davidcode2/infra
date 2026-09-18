@@ -36,6 +36,7 @@ locals {
     oauth2_proxy        = "oauth2-proxy"
     argocd              = "argocd"
     vacation_product    = "vacation-product"
+    smiles              = "smiles"
   }
 
   # ci-role patterns (wildcard suffix *)
