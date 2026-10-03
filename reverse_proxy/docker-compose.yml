@@ -1,6 +1,6 @@
 services:
   reverse-proxy-certonly:
-    image: nginx:alpine
+    image: nginx:alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2
     container_name: reverse_proxy_for_certbot
     configs:
       - source: nginx_certonly_conf
@@ -15,7 +15,7 @@ services:
       - app-network
 
   certbot:
-    image: certbot/certbot
+    image: certbot/certbot@sha256:f70ad0adbb7e117f0fe42a63c553f28ea451edabc0148757b6efcd9735acaa20
     container_name: certbot
     depends_on:
       reverse-proxy-certonly:
@@ -43,7 +43,7 @@ services:
       -d immo.jakob-lingel.dev
 
   reverse-proxy:
-    image: nginx:alpine
+    image: nginx:alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2
     container_name: reverse_proxy
     depends_on: 
       certbot:
@@ -63,7 +63,7 @@ services:
     restart: unless-stopped
 
   certbot-renewal-manager: 
-    image: certbot/certbot
+    image: certbot/certbot@sha256:f70ad0adbb7e117f0fe42a63c553f28ea451edabc0148757b6efcd9735acaa20
     container_name: certbot_renewal_manager
     volumes:
       - certbot-etc:/etc/letsencrypt
