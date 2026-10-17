@@ -59,6 +59,12 @@ jobs:
           echo "$PARAMS" | jq -c '.[]' | while read -r param; do
             name=$(echo "$param" | jq -r '.[0]')
             value=$(echo "$param" | jq -r '.[1]')
+
+            # Mask fetched values before exporting them to later step environments
+            masked_value="${value//'%'/'%25'}"
+            masked_value="${masked_value//$'\r'/'%0D'}"
+            masked_value="${masked_value//$'\n'/'%0A'}"
+            printf '::add-mask::%s\n' "$masked_value"
             
             # Convert /infra/terraform/providers/hcloud_token to TF_VAR_hcloud_token
             # Convert /infra/terraform/dns/schluesselmomente_dkim to TF_VAR_schluesselmomente_dkim
@@ -203,6 +209,12 @@ jobs:
           echo "$PARAMS" | jq -c '.[]' | while read -r param; do
             name=$(echo "$param" | jq -r '.[0]')
             value=$(echo "$param" | jq -r '.[1]')
+
+            # Mask fetched values before exporting them to later step environments
+            masked_value="${value//'%'/'%25'}"
+            masked_value="${masked_value//$'\r'/'%0D'}"
+            masked_value="${masked_value//$'\n'/'%0A'}"
+            printf '::add-mask::%s\n' "$masked_value"
             
             # Convert /infra/terraform/providers/hcloud_token to TF_VAR_hcloud_token
             # Convert /infra/terraform/dns/schluesselmomente_dkim to TF_VAR_schluesselmomente_dkim

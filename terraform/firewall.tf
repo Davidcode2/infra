@@ -49,6 +49,19 @@ resource "hcloud_firewall" "k8s_cluster" {
     ]
   }
 
+  # Allow kubelet metrics access between cluster nodes
+  rule {
+    direction = "in"
+    protocol  = "tcp"
+    port      = "10250"
+    source_ips = [
+      "116.203.111.240/32", # k8s-node-1
+      "195.201.5.29/32",    # k8s-node-2
+      "91.98.235.232/32",   # k8s-node-3
+      "178.104.133.8/32",   # k8s-worker-1
+    ]
+  }
+
   # Kubernetes NodePort range (for load balancer health checks)
   rule {
     direction = "in"
