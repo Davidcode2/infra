@@ -73,12 +73,12 @@ resource "digitalocean_record" "jakob_lingel_dev_immo_google_verification" {
   ttl    = 1800
 }
 
-# google search ownership verification TXT record for portfolio.jakob-lingel.dev
-resource "digitalocean_record" "jakob_lingel_dev_portfolio_google_verification" {
+# Preserve the existing Google site verification record and Terraform identity
+resource "digitalocean_record" "jakob_lingel_dev_google_verification" {
   domain = digitalocean_domain.jakob-lingel-dev.name
   type   = "TXT"
   name   = "@"
-  value  = "google-site-verification=9mS_je2OJqOW8vlDGA6jXDVgi79c4rpxNg1t5u2VRN8"
+  value  = "google-site-verification=6cc-R32CLdo5pnRguKt10WTFCVnkBcy8lQKiHPXGfUo"
   ttl    = 1800
 }
 
