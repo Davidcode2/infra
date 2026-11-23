@@ -332,6 +332,15 @@ resource "digitalocean_record" "jakob_lingel_dev_tango" {
   ttl    = 1800
 }
 
+# radar-taskboard CNAME record
+resource "digitalocean_record" "jakob_lingel_dev_radar_taskboard" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "radar-taskboard"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # oauth2 CNAME record 
 resource "digitalocean_record" "jakob_lingel_dev_oauth" {
   domain = digitalocean_domain.jakob-lingel-dev.name
