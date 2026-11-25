@@ -100,6 +100,15 @@ resource "digitalocean_record" "jakob_lingel_dev_alemazung" {
   ttl    = 1800
 }
 
+# Astro preview, separate from the existing Alemazung site.
+resource "digitalocean_record" "jakob_lingel_dev_alemazungv2" {
+  domain = digitalocean_domain.jakob-lingel-dev.name
+  type   = "CNAME"
+  name   = "alemazungv2"
+  value  = "${digitalocean_domain.jakob-lingel-dev.name}."
+  ttl    = 1800
+}
+
 # analytics CNAME record
 resource "digitalocean_record" "jakob_lingel_dev_analytics" {
   domain = digitalocean_domain.jakob-lingel-dev.name
